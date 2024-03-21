@@ -1,120 +1,291 @@
 import * as THREE from "three";
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+let camera, scene, renderer, controls;
 
+const objects = [];
 
-const geometry = new THREE.BoxGeometry(1000, 1000, 1000);
-const loader = new THREE.CubeTextureLoader();
-loader.setPath("");
+let raycaster;
 
-const textureCube = loader.load([
-  "t.png",
-  "t.png",
-  "t.png",
-  "t.png",
-  "t.png",
-  "t.png",
-]);
+let moveForward = false;
+let moveBackward = false;
+let moveLeft = false;
+let moveRight = false;
+let canJump = false;
 
-const material = new THREE.MeshBasicMaterial({
-  color: 0xffffff,
-  envMap: textureCube,
-});
-material.side = THREE.DoubleSide;
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-camera.position.z = 5;
+let prevTime = performance.now();
+const velocity = new THREE.Vector3();
+const direction = new THREE.Vector3();
+const vertex = new THREE.Vector3();
+const color = new THREE.Color();
 
-const plane = new THREE.PlaneGeometry(1000, 1000);
-const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x964b00 });
-planeMaterial.side = THREE.DoubleSide;
-const planeMesh = new THREE.Mesh(plane, planeMaterial);
-planeMesh.rotateX(1.5708);
-planeMesh.position.y -= 100;
-scene.add(planeMesh);
-const char_geo = new THREE.BoxGeometry(1, 1, 1);
-const char_mat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    envMap: textureCube,
-  });;
-const character = new THREE.Mesh(char_geo, char_mat);
-character.position.y = -99.5;
-function Random_Boxes(number) {
-  for (let i = 0; i < number; i++) {
-    let geo = new THREE.BoxGeometry(1, 1, 1);
-    let mat = new THREE.MeshBasicMaterial({ color: 0x00 });
-    let cter = new THREE.Mesh(geo, mat);
-    cter.position.set(
-      Math.random() * 2000 - 1000,
-      -99.5,
-      Math.random() * 2000 - 1000
-    );
-    scene.add(cter);
-  }
-}
-var angleX = 0;
-var angleY = 0;
-Random_Boxes(10_000);
-scene.add(character);
-function Movement(e) {
-//   camera.position.set(character.position.x - cam_rot_x, character.position.y + 5, character.position.z - cam_rot_z  );
+init();
+animate();
 
-  let distance = 5;
-  let theta = angleX*(Math.PI / 180);
-  let phi = angleY*(Math.PI / 180);
-  let x = Math.cos(theta) * Math.cos(phi) * distance;
-  let y = Math.sin(theta) * Math.cos(phi) * distance;
-  let z = distance * Math.sin(phi);
-  camera.position.set(x,y,z);
-  camera.position.add(character.position);
+function init() {
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    1,
+    1000
+  );
+  camera.position.y = 10;
 
-  camera.lookAt(character.position);
-  if (e.key.toLowerCase() == "w") {
-    character.position.x -= 0.1;
-  }
-  if (e.key.toLowerCase() == "d") {
-    character.position.z -= 0.1;
-  }
-  if (e.key.toLowerCase() == "s") {
-    character.position.x += 0.1;
-  }
-  if (e.key.toLowerCase() == "a") {
-    character.position.z += 0.1;
-  }
-}
-addEventListener("keydown", (e) => {
-  Movement(e);
-});
-var px,py,cx,cy;
-var mousedown = false;
-addEventListener('mousedown', (e)=>{mousedown = true});
-addEventListener('mouseup', (e)=>{mousedown = false});
-addEventListener('mousemove', e=>{
-    px=cx;
-    py=cy;
-    cx=e.clientX;
-    cy=e.clientY;
-    if(mousedown){
-        let changeX = cx-px;
-        let changeY = cy-py;
-        angleY += changeX;
-        angleX += changeY;
-        console.log(angleX,angleY)
+  scene = new THREE.Scene();
+  const loader = new THREE.CubeTextureLoader();
+  const texture = loader.load([
+    "./resources/posx.jpg",
+    "./resources/negx.jpg",
+    "./resources/posy.jpg",
+    "./resources/negy.jpg",
+    "./resources/posz.jpg",
+    "./resources/negz.jpg",
+  ]);
+  scene.background = texture;
+  scene.fog = new THREE.Fog(0xffffff, 0, 750);
+
+  const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 2.5);
+  light.position.set(0.5, 1, 0.75);
+  scene.add(light);
+
+  controls = new PointerLockControls(camera, document.body);
+
+  const blocker = document.getElementById("blocker");
+  const instructions = document.getElementById("instructions");
+
+  instructions.addEventListener("click", function () {
+    controls.lock();
+  });
+
+  controls.addEventListener("lock", function () {
+    instructions.style.display = "none";
+    blocker.style.display = "none";
+  });
+
+  controls.addEventListener("unlock", function () {
+    blocker.style.display = "block";
+    instructions.style.display = "";
+  });
+
+  scene.add(controls.getObject());
+
+  const onKeyDown = function (event) {
+    switch (event.code) {
+      case "ArrowUp":
+      case "KeyW":
+        moveForward = true;
+        break;
+
+      case "ArrowLeft":
+      case "KeyA":
+        moveLeft = true;
+        break;
+
+      case "ArrowDown":
+      case "KeyS":
+        moveBackward = true;
+        break;
+
+      case "ArrowRight":
+      case "KeyD":
+        moveRight = true;
+        break;
+
+      case "Space":
+        if (canJump === true) velocity.y += 350;
+        canJump = false;
+        break;
     }
-})
-Movement({ key: "test" });
+  };
+
+  const onKeyUp = function (event) {
+    switch (event.code) {
+      case "ArrowUp":
+      case "KeyW":
+        moveForward = false;
+        break;
+
+      case "ArrowLeft":
+      case "KeyA":
+        moveLeft = false;
+        break;
+
+      case "ArrowDown":
+      case "KeyS":
+        moveBackward = false;
+        break;
+
+      case "ArrowRight":
+      case "KeyD":
+        moveRight = false;
+        break;
+    }
+  };
+
+  document.addEventListener("keydown", onKeyDown);
+  document.addEventListener("keyup", onKeyUp);
+
+  raycaster = new THREE.Raycaster(
+    new THREE.Vector3(),
+    new THREE.Vector3(0, -1, 0),
+    0,
+    10
+  );
+
+  // floor
+
+  let floorGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100);
+  floorGeometry.rotateX(-Math.PI / 2);
+
+  // vertex displacement
+
+  let position = floorGeometry.attributes.position;
+
+  for (let i = 0, l = position.count; i < l; i++) {
+    vertex.fromBufferAttribute(position, i);
+
+    vertex.x += Math.random() * 20 - 10;
+    vertex.y += Math.random() * 2;
+    vertex.z += Math.random() * 20 - 10;
+
+    position.setXYZ(i, vertex.x, vertex.y, vertex.z);
+  }
+
+  floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+
+  position = floorGeometry.attributes.position;
+  const colorsFloor = [];
+
+  for (let i = 0, l = position.count; i < l; i++) {
+    color.setHSL(
+      Math.random() * 0.3 + 0.5,
+      0.75,
+      Math.random() * 0.25 + 0.75,
+      THREE.SRGBColorSpace
+    );
+    colorsFloor.push(color.r, color.g, color.b);
+  }
+
+  floorGeometry.setAttribute(
+    "color",
+    new THREE.Float32BufferAttribute(colorsFloor, 3)
+  );
+
+  const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+
+  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+  scene.add(floor);
+
+  // objects
+
+  const boxGeometry = new THREE.BoxGeometry(20, 20, 20).toNonIndexed();
+
+  position = boxGeometry.attributes.position;
+  const colorsBox = [];
+
+  for (let i = 0, l = position.count; i < l; i++) {
+    color.setHSL(
+      Math.random() * 0.3 + 0.5,
+      0.75,
+      Math.random() * 0.25 + 0.75,
+      THREE.SRGBColorSpace
+    );
+    colorsBox.push(color.r, color.g, color.b);
+  }
+
+  boxGeometry.setAttribute(
+    "color",
+    new THREE.Float32BufferAttribute(colorsBox, 3)
+  );
+
+  for (let i = 0; i < 500; i++) {
+    const boxMaterial = new THREE.MeshPhongMaterial({
+      specular: 0xffffff,
+      flatShading: true,
+      vertexColors: true,
+    });
+    boxMaterial.color.setHSL(
+      Math.random() * 0.2 + 0.5,
+      0.75,
+      Math.random() * 0.25 + 0.75,
+      THREE.SRGBColorSpace
+    );
+
+    const box = new THREE.Mesh(boxGeometry, boxMaterial);
+    box.position.x = Math.floor(Math.random() * 20 - 10) * 20;
+    box.position.y = Math.floor(Math.random() * 20) * 20 + 10;
+    box.position.z = Math.floor(Math.random() * 20 - 10) * 20;
+
+    scene.add(box);
+    objects.push(box);
+  }
+
+  //
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  //
+
+  window.addEventListener("resize", onWindowResize);
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
 function animate() {
   requestAnimationFrame(animate);
+
+  const time = performance.now();
+
+  if (controls.isLocked === true) {
+    raycaster.ray.origin.copy(controls.getObject().position);
+    raycaster.ray.origin.y -= 10;
+
+    const intersections = raycaster.intersectObjects(objects, false);
+
+    const onObject = intersections.length > 0;
+
+    const delta = (time - prevTime) / 1000;
+
+    velocity.x -= velocity.x * 10.0 * delta;
+    velocity.z -= velocity.z * 10.0 * delta;
+
+    velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+    direction.z = Number(moveForward) - Number(moveBackward);
+    direction.x = Number(moveRight) - Number(moveLeft);
+    direction.normalize(); // this ensures consistent movements in all directions
+
+    if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
+    if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
+
+    if (onObject === true) {
+      velocity.y = Math.max(0, velocity.y);
+      canJump = true;
+    }
+
+    controls.moveRight(-velocity.x * delta);
+    controls.moveForward(-velocity.z * delta);
+
+    controls.getObject().position.y += velocity.y * delta; // new behavior
+
+    if (controls.getObject().position.y < 10) {
+      velocity.y = 0;
+      controls.getObject().position.y = 10;
+
+      canJump = true;
+    }
+  }
+
+  prevTime = time;
+
   renderer.render(scene, camera);
 }
-animate();
