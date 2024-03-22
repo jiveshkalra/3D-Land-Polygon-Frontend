@@ -1,7 +1,13 @@
 //imports
 import * as THREE from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+window.textGeo = TextGeometry;
+window.three = THREE;
+window.createPedestal = createActualPedestal;
 //var definition
 let camera, scene, renderer, controls;
 const objects = [];
@@ -33,12 +39,15 @@ var currentY = 0;
 var maxX = 120;
 var maxY = 200;
 var pedestals = [];
+var textMarkers = [];
+let font;
+let models = [];
 //start app;
 init();
 animate();
 //function definitions
 
-function createPedestal(objectCode) {
+function createPedestal(url, objectCode) {
   let fbxloader = new FBXLoader();
   fbxloader.load("./resources/pedestal/source/Pedestal_low.fbx", (model) => {
     ped = model.children[0];
@@ -64,8 +73,24 @@ function createPedestal(objectCode) {
       "./resources/pedestal/textures/Pedestal_low_lambert2_Emission.png"
     );
     objects.push(ped);
+    new GLTFLoader().load(url, (mdl) => {
+      mdl.scene.name = "";
+      mdl.scene.scale.set(0.1,0.1,0.1);
+      models.push(mdl.scene);
+      scene.add(mdl.scene);
+    });
     createTrigger(ped, objectCode);
   });
+}
+
+async function createActualPedestal(url_json){
+  let res = await fetch(url_json);
+  let data = await res.json();
+  createPedestal(data.model_url, data);
+  console.log(data);
+}
+function textScript(self) {
+  // self.lookAt(camera.position);
 }
 function createTrigger(pedestal, objectCode) {
   pedestal.position.y += 2;
@@ -73,11 +98,32 @@ function createTrigger(pedestal, objectCode) {
     new THREE.BoxGeometry(30, 10, 30),
     new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true })
   );
-  trigger.position.copy(pedestal.position);
+  font;
+  new FontLoader().load(
+    "https://unpkg.com/three@0.157.0/examples/fonts/helvetiker_bold.typeface.json",
+    (res) => {
+      font = res;
+      let text = new THREE.Mesh(
+        new TextGeometry("Sasta Maal", {
+          font: font,
+        }),
+        new THREE.MeshPhongMaterial({ color: 0x00ffff })
+      );
+      window.font = font;
+      text.scale.set(0.05, 0.05, 0.05);
+      text.update = textScript;
+      // scene.add(text);
+      // trigger.position.copy(pedestal.position);
+      text.position.y += 30;
+      text.position.x -= 15;
+      textMarkers.push(text);
+    }
+  );
   trigger.name = "trigger";
   pedestal.children[0] = trigger;
-  trigger.material.opacity = 0.2;
+  trigger.material.opacity = 0.001;
   trigger.objectCode = objectCode;
+  pedestal.objectCode = objectCode;
   scene.add(trigger);
   triggers.push(trigger);
 }
@@ -254,40 +300,34 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  createPedestal({
-    type: "purchase",
-    link: "https://purchase.net/NFTTradeLink",
-    price: "3eth",
-    model_link: "https://models.tk",
-  });
+  createActualPedestal('https://gateway.pinata.cloud/ipfs/QmVZV2rFuYjapcHCgun4Uy2mdNf2gDWBAyp1PQE5Xuf9cp');
 
-  createPedestal({
-    type: "purchase",
-    link: "https://purchase.net/NFTTradeLink",
-    price: "13eth",
-    model_link: "https://models.tk",
-  });
   scene.createPedestal = createPedestal;
 }
 //mainLOOP
 function animate() {
   requestAnimationFrame(animate);
   const time = performance.now();
-
   pedestals = [];
   for (let child of scene.children) {
-    if (child.children.length > 0 && !child.Set) {
+    if (child.update) child.update(child);
+    if (child.children.length > 0 && child.isMesh ) {
       pedestals.push(child);
     }
-  }
-  if(currentX > maxX){
+  } 
+  if (currentX > maxX) {
     currentX = parseFloat(startX.toString());
-    currentY += 40
+    currentY += 40;
   }
-  if(currentY > maxY){
+  if (currentY > maxY) {
     currentY = parseFloat(startY.toString());
   }
-  pedestals.map((p,i) => {
+  pedestals.map((p, i) => {
+    models[i].position.copy(p.position);
+    models[i].position.y = 30;
+    models[i].position.x += 4;
+    models[i].position.z -= 4;
+    // console.log(i)
     if (p.position.x == 0 && p.position.z == 0 && i != 0) {
       p.position.x = currentX;
       p.position.z = currentY;
@@ -324,7 +364,7 @@ function animate() {
     if (stepTime > 1.0 && isTriggerSteppedOnThisFrame) {
       console.log(triggersSteppedOn[0].object.objectCode);
       document.querySelector("#info").innerText =
-        triggersSteppedOn[0].object.objectCode.price;
+        triggersSteppedOn[0].object.objectCode.cost;
       controls.unlock();
       stepTime = 0;
     }

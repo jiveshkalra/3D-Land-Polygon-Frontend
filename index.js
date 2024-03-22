@@ -5,6 +5,9 @@ const fs = require("fs");
 const multer = require("multer");
 const pinataSDK = require("@pinata/sdk");
 
+const cors = require('cors');
+app.use(cors())
+
 const path = require("path");
 const crypto = require("crypto");
 const multer_storage = multer.diskStorage({
