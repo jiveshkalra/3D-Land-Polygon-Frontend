@@ -83,7 +83,7 @@ function createTrigger(pedestal, objectCode) {
 }
 function createFloor() {
   // floor
-  let scale = 1;
+  let scale = 2;
   let floorGeometry = new THREE.PlaneGeometry(
     2000 * scale,
     2000 * scale,
@@ -287,8 +287,8 @@ function animate() {
   if(currentY > maxY){
     currentY = parseFloat(startY.toString());
   }
-  pedestals.map((p) => {
-    if (p.position.x == 0 && p.position.z == 0) {
+  pedestals.map((p,i) => {
+    if (p.position.x == 0 && p.position.z == 0 && i != 0) {
       p.position.x = currentX;
       p.position.z = currentY;
       p.children[0].position.x = currentX;
