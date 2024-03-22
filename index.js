@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
+app.use(cors())
+
 const path = require('path');
 app.use(express.static('public'));
 app.get('/',(req,res)=>{
