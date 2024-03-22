@@ -1,8 +1,11 @@
+//imports
 import * as THREE from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
-
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+//var definition
 let camera, scene, renderer, controls;
 const objects = [];
+const triggers = [];
 let raycaster1;
 let raycaster2;
 let raycaster3;
@@ -17,29 +20,100 @@ const velocity = new THREE.Vector3();
 const direction = new THREE.Vector3();
 const vertex = new THREE.Vector3();
 const color = new THREE.Color();
-
+var stepTime = 0;
+var isTriggerSteppedOnThisFrame = false;
+let ped;
+var floor;
+var light;
+var light_mult = 1;
+var startX = 0;
+var startY = 0;
+var currentX = 0;
+var currentY = 0;
+var maxX = 120;
+var maxY = 200;
+var pedestals = [];
+//start app;
 init();
 animate();
+//function definitions
 
-function init() {
-  camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.01,
-    1000
+function createPedestal(objectCode) {
+  let fbxloader = new FBXLoader();
+  fbxloader.load("./resources/pedestal/source/Pedestal_low.fbx", (model) => {
+    ped = model.children[0];
+    scene.add(ped);
+    let scaleFactor = 10;
+    ped.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    ped.material.map = new THREE.TextureLoader().load(
+      "./resources/pedestal/textures/Pedestal_low_lambert2_AlbedoTransparency.png"
+    );
+    ped.material.normalMap = new THREE.TextureLoader().load(
+      "./resources/pedestal/textures/Pedestal_low_lambert2_Normal.png"
+    );
+    ped.material.metalnessMap = new THREE.TextureLoader().load(
+      "./resources/pedestal/textures/Pedestal_low_lambert2_MetallicSmoothness.png"
+    );
+    ped.material.metalness = 100;
+    ped.material.aoMap = new THREE.TextureLoader().load(
+      "./resources/pedestal/textures/Pedestal_low_lambert2_AmbientOcclusion.png"
+    );
+    ped.material.emissiveIntensity = 0.5;
+    ped.material.emissive = new THREE.Color(100, 100, 100);
+    ped.material.emissiveMap = new THREE.TextureLoader().load(
+      "./resources/pedestal/textures/Pedestal_low_lambert2_Emission.png"
+    );
+    objects.push(ped);
+    createTrigger(ped, objectCode);
+  });
+}
+function createTrigger(pedestal, objectCode) {
+  pedestal.position.y += 2;
+  let trigger = new THREE.Mesh(
+    new THREE.BoxGeometry(30, 10, 30),
+    new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true })
   );
-  camera.position.y = 10;
+  trigger.position.copy(pedestal.position);
+  trigger.name = "trigger";
+  pedestal.children[0] = trigger;
+  trigger.material.opacity = 0.2;
+  trigger.objectCode = objectCode;
+  scene.add(trigger);
+  triggers.push(trigger);
+}
+function createFloor() {
+  // floor
+  let scale = 1;
+  let floorGeometry = new THREE.PlaneGeometry(
+    2000 * scale,
+    2000 * scale,
+    1000 * scale,
+    1000 * scale
+  );
+  floorGeometry.rotateX(-Math.PI / 2);
 
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffffff);
-  scene.fog = new THREE.Fog(0xffffff, 0, 750);
+  const floorMaterial = new THREE.MeshPhongMaterial({
+    color: 0xb0c87f,
+    // transparent: true,
+  });
+  const normalTexture = new THREE.TextureLoader().load(
+    "./resources/normal_Maps/download.jpeg"
+  );
 
-  const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 2.5);
-  light.position.set(0.5, 1, 0.75);
-  scene.add(light);
+  const grassTexture = new THREE.TextureLoader().load(
+    "./resources/normal_Maps/grass.jpg"
+  );
+  grassTexture.repeat.set(8, 8);
+  grassTexture.wrapS = THREE.RepeatWrapping;
+  grassTexture.wrapT = THREE.RepeatWrapping;
+  floorMaterial.map = grassTexture;
+  floorMaterial.normalMap = normalTexture;
+  floorMaterial.normalScale.set(80, 80);
+  floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
-  controls = new PointerLockControls(camera, document.body);
-
+  scene.add(floor);
+}
+function createEventListeners() {
   const blocker = document.getElementById("blocker");
   const instructions = document.getElementById("instructions");
 
@@ -56,8 +130,6 @@ function init() {
     blocker.style.display = "block";
     instructions.style.display = "";
   });
-
-  scene.add(controls.getObject());
 
   const onKeyDown = function (event) {
     switch (event.code) {
@@ -114,6 +186,47 @@ function init() {
 
   document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
+  window.addEventListener("resize", onWindowResize);
+}
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+function sceneAndCameraSetup() {
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.01,
+    1000
+  );
+  camera.position.y = 10;
+
+  scene = new THREE.Scene();
+  const loader = new THREE.CubeTextureLoader();
+  const texture = loader.load([
+    "./resources/posx.jpg",
+    "./resources/negx.jpg",
+    "./resources/posy.jpg",
+    "./resources/negy.jpg",
+    "./resources/posz.jpg",
+    "./resources/negz.jpg",
+  ]);
+  scene.background = texture;
+  scene.fog = new THREE.Fog(0xb0c87f, 1, 1000);
+  window.scene = scene;
+}
+//init function
+function init() {
+  sceneAndCameraSetup();
+  light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 4.5);
+  scene.add(light);
+
+  controls = new PointerLockControls(camera, document.body);
+  scene.add(controls.getObject());
+
+  createEventListeners();
 
   raycaster1 = new THREE.Raycaster(
     new THREE.Vector3(),
@@ -127,122 +240,96 @@ function init() {
     0,
     5
   );
-
-  // floor
-
-  let floorGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100);
-  floorGeometry.rotateX(-Math.PI / 2);
-
-  // vertex displacement
-
-  let position = floorGeometry.attributes.position;
-
-  for (let i = 0, l = position.count; i < l; i++) {
-    vertex.fromBufferAttribute(position, i);
-
-    vertex.x += Math.random() * 20 - 10;
-    vertex.y += Math.random() * 2;
-    vertex.z += Math.random() * 20 - 10;
-
-    position.setXYZ(i, vertex.x, vertex.y, vertex.z);
-  }
-
-  floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
-
-  position = floorGeometry.attributes.position;
-  const colorsFloor = [];
-
-  for (let i = 0, l = position.count; i < l; i++) {
-    color.setHSL(
-      Math.random() * 0.3 + 0.5,
-      0.75,
-      Math.random() * 0.25 + 0.75,
-      THREE.SRGBColorSpace
-    );
-    colorsFloor.push(color.r, color.g, color.b);
-  }
-
-  floorGeometry.setAttribute(
-    "color",
-    new THREE.Float32BufferAttribute(colorsFloor, 3)
+  raycaster3 = new THREE.Raycaster(
+    new THREE.Vector3(),
+    new THREE.Vector3(0, -1, 0),
+    0,
+    5
   );
 
-  const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
-
-  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  scene.add(floor);
-
-  // objects
-
-  const boxGeometry = new THREE.BoxGeometry(2, 2, 2).toNonIndexed();
-
-  position = boxGeometry.attributes.position;
-  const colorsBox = [];
-
-  for (let i = 0, l = position.count; i < l; i++) {
-    color.setHSL(
-      Math.random() * 0.3 + 0.5,
-      0.75,
-      Math.random() * 0.25 + 0.75,
-      THREE.SRGBColorSpace
-    );
-    colorsBox.push(color.r, color.g, color.b);
-  }
-
-  boxGeometry.setAttribute(
-    "color",
-    new THREE.Float32BufferAttribute(colorsBox, 3)
-  );
-
-  //
+  createFloor();
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  window.addEventListener("resize", onWindowResize);
-  let dabba = new THREE.Mesh(
-    new THREE.BoxGeometry(10, 10, 10),
-    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-  );
-  dabba.position.x += 20;
-  dabba.position.y += 5;
-  scene.add(dabba);
-  objects.push(dabba);
+  createPedestal({
+    type: "purchase",
+    link: "https://purchase.net/NFTTradeLink",
+    price: "3eth",
+    model_link: "https://models.tk",
+  });
+
+  createPedestal({
+    type: "purchase",
+    link: "https://purchase.net/NFTTradeLink",
+    price: "13eth",
+    model_link: "https://models.tk",
+  });
+  scene.createPedestal = createPedestal;
 }
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
+//mainLOOP
 function animate() {
   requestAnimationFrame(animate);
-
   const time = performance.now();
+
+  pedestals = [];
+  for (let child of scene.children) {
+    if (child.children.length > 0 && !child.Set) {
+      pedestals.push(child);
+    }
+  }
+  if(currentX > maxX){
+    currentX = parseFloat(startX.toString());
+    currentY += 40
+  }
+  if(currentY > maxY){
+    currentY = parseFloat(startY.toString());
+  }
+  pedestals.map((p) => {
+    if (p.position.x == 0 && p.position.z == 0) {
+      p.position.x = currentX;
+      p.position.z = currentY;
+      p.children[0].position.x = currentX;
+      p.children[0].position.z = currentY;
+      currentX += 40;
+    }
+  });
+
+  const delta = (time - prevTime) / 1000;
 
   if (controls.isLocked === true) {
     raycaster1.ray.origin.copy(controls.getObject().position);
     raycaster1.ray.origin.y -= 10;
-    // raycaster2.ray.origin.copy(controls.getObject().position);
-    // controls.getObject().getWorldDirection(v);
-    // raycaster2.ray.direction.set(v);
-    let intersections = 0;
-    for(let x = 0; x < 1;x++){
-        for(let y = 0; y < 2;y++){
-            raycaster2.setFromCamera(new THREE.Vector3(x - 0.5,y-1), camera)
-            intersections += raycaster2.intersectObjects(objects, false).length;
-        }
+    raycaster3.ray.origin.copy(controls.getObject().position);
+    let intersectionsFront = 0;
+    let intersectionsBack = 0;
+    let intersectionsLeft = 0;
+    let intersectionsRight = 0;
+    for (let x = 0; x < 1; x++) {
+      for (let y = 0; y < 2; y++) {
+        raycaster2.setFromCamera(new THREE.Vector3(x - 0.5, y - 1), camera);
+        intersectionsFront += raycaster2.intersectObjects(
+          objects,
+          false
+        ).length;
+      }
     }
-    console.log(intersections);
     const intersections1 = raycaster1.intersectObjects(objects, false);
+    const triggersSteppedOn = raycaster3.intersectObjects(triggers, false);
+    isTriggerSteppedOnThisFrame = triggersSteppedOn.length > 0;
+
+    if (isTriggerSteppedOnThisFrame) stepTime += 0.01;
+    if (stepTime > 1.0 && isTriggerSteppedOnThisFrame) {
+      console.log(triggersSteppedOn[0].object.objectCode);
+      document.querySelector("#info").innerText =
+        triggersSteppedOn[0].object.objectCode.price;
+      controls.unlock();
+      stepTime = 0;
+    }
 
     const onObject = intersections1.length > 0;
-
-    const delta = (time - prevTime) / 1000;
 
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
@@ -260,9 +347,12 @@ function animate() {
       velocity.y = Math.max(0, velocity.y);
       canJump = true;
     }
+    light.intensity += 0.1 * light_mult;
+    if (light.intensity > 4) light_mult *= -1;
+    if (light.intensity < -4) light_mult *= -1;
 
     controls.moveRight(-velocity.x * delta);
-    if(!intersections)controls.moveForward(-velocity.z * delta);
+    if (!intersectionsFront) controls.moveForward(-velocity.z * delta);
 
     controls.getObject().position.y += velocity.y * delta; // new behavior
 
@@ -274,7 +364,9 @@ function animate() {
     }
   }
 
+  if (!isTriggerSteppedOnThisFrame) {
+    stepTime = 0;
+  }
   prevTime = time;
-
   renderer.render(scene, camera);
 }
