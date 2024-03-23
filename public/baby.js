@@ -5,9 +5,11 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import {getAllNFTs} from "./nfts.js"
 window.textGeo = TextGeometry;
 window.three = THREE;
-window.createPedestal = createActualPedestal;
+// window.createPedestal = createActualPedestal;
+window.loadAllPedestals = loadAllPedestals;
 //var definition
 let camera, scene, renderer, controls;
 const objects = [];
@@ -82,12 +84,24 @@ function createPedestal(url, objectCode) {
     createTrigger(ped, objectCode);
   });
 }
+ 
+// async function createActualPedestal(url_json){
+//   let res = await fetch(url_json);
+//   let data = await res.json();
+//   createPedestal(data.model_url, data);
+//   console.log(data);
+// }
 
-async function createActualPedestal(url_json){
-  let res = await fetch(url_json);
-  let data = await res.json();
-  createPedestal(data.model_url, data);
-  console.log(data);
+async function loadAllPedestals(){
+  let data = await getAllNFTs()
+  data.map((d)=>{
+    try{
+      createPedestal(d.model_url, d);
+    }
+    catch(err){
+      console.log(err)
+    }
+  })
 }
 function textScript(self) {
   // self.lookAt(camera.position);
@@ -300,8 +314,8 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  createActualPedestal('https://gateway.pinata.cloud/ipfs/QmVZV2rFuYjapcHCgun4Uy2mdNf2gDWBAyp1PQE5Xuf9cp');
-
+  // createActualPedestal('https://gateway.pinata.cloud/ipfs/QmVZV2rFuYjapcHCgun4Uy2mdNf2gDWBAyp1PQE5Xuf9cp');
+  loadAllPedestals()
   scene.createPedestal = createPedestal;
 }
 //mainLOOP
