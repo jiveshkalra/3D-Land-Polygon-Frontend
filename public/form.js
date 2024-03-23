@@ -1,4 +1,5 @@
-// import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"; 
+ 
+// import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js";
 window.main = async () => {
   let signer = null;
   let provider;
@@ -25,41 +26,47 @@ async function enableButton() {
   listButton.style.backgroundColor = "#A500FF";
   listButton.style.opacity = 1;
 }
- 
-const listNFT = () => { 
-  const formData = new FormData(document.querySelector("form"));
-  fetch("/add", {
+
+const listNFT = async () => {
+  disableButton() 
+  console.log("fetching the response");
+  const formData = new FormData(document.querySelector("form")); 
+  try{
+    
+  let response = await fetch("/add", {
     method: "POST",
     body: formData,
-  })
-    .then((response) => response.json())
-    .then(async (data) => {
-      console.log(data)
-      if (data.status == "success") {
-        alert("Model added successfully");
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        let contract = new ethers.Contract(
-          Marketplace.address,
-          Marketplace.abi,
-          signer
-        );
+  }) 
+  const Marketplace = await fetch("/Marketplace").then((res) => res.json());
+  let data =  await response.json()   
+    if (data.status == "success") {
+      console.log("Model added successfully");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      let contract = new ethers.Contract(
+        Marketplace.address,
+        Marketplace.abi,
+        signer
+      );
 
-        //massage the params to be sent to the create NFT request
-        const price = ethers.utils.parseUnits(formParams.price, "ether");
-        let listingPrice = await contract.getListPrice();
-        listingPrice = listingPrice.toString();
+      //massage the params to be sent to the create NFT request
+      const price = ethers.utils.parseUnits(formData.get('cost'), "ether");
+       let listingPrice = await contract.getListPrice();
+      listingPrice = listingPrice.toString();
 
-        //actually create the NFT
-        let transaction = await contract.createToken(metadataURL, price, {
-          value: listingPrice,
-        });
-        await transaction.wait();
+      //actually create the NFT
+      let transaction = await contract.createToken(data.url, price, {
+        value: listingPrice,
+      });
+      await transaction.wait();
 
-        alert("Successfully listed your NFT!");
-        window.location.href = "/";
-      } else {
-        alert("Error adding model");
-      }
-    });
+      alert("Successfully listed your NFT!");
+      window.location.href = "/";
+    } else {
+      alert("Error adding model");
+    }
+ 
+  }catch(err){
+    console.error(err)
+  }
 };
