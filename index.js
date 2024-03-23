@@ -36,10 +36,9 @@ app.post("/add", upload.any(), (req, res) => {
     var entry = {
       id: id,
       model_name: req.body.model_name,
-      seller_wallet: req.body.seller_wallet,
       cost: req.body.cost,
       description: req.body.description,
-      tags: req.body.tags,
+      // tags: req.body.tags,
       category: req.body.category,
     };
 
@@ -60,31 +59,35 @@ app.post("/add", upload.any(), (req, res) => {
       },
     };
 
-    pinata.pinFileToIPFS(readableStreamForFile, options).then((result) => {
-      const url = "https://gateway.pinata.cloud/ipfs/" + result.IpfsHash;
-      entry.model_url = url;
-      const options = {
+    pinata
+      .pinFileToIPFS(readableStreamForFile, options)
+      .then((result) => {
+        const url = "https://gateway.pinata.cloud/ipfs/" + result.IpfsHash;
+        entry.model_url = url;
+        const options = {
           pinataMetadata: {
             name: `${id}.json`,
           },
           pinataOptions: {
             cidVersion: 0,
           },
-      }
-     pinata.pinJSONToIPFS(entry, options).then((result) => { 
-            const json_url = "https://gateway.pinata.cloud/ipfs/" + result.IpfsHash;
+        };
+        pinata
+          .pinJSONToIPFS(entry, options)
+          .then((result) => {
+            const json_url =
+              "https://gateway.pinata.cloud/ipfs/" + result.IpfsHash;
             console.log(json_url);
             return res.status(200).send({ url: json_url, status: "success" });
           })
           .catch((err) => {
-            console.log(err)
-            return res.status(500).send({ err:err, status: "failed" });
+            console.log(err);
+            return res.status(500).send({ err: err, status: "failed" });
           });
-          
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.status(500).send({ err:err, status: "failed" });
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).send({ err: err, status: "failed" });
       });
   } else {
     res.status(400).send("Invalid request body");

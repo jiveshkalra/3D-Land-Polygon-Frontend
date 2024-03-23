@@ -1,16 +1,18 @@
- 
-// import * as ethers from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js";
-window.main = async () => {
+
+const main= async () => {
   let signer = null;
   let provider;
   if (window.ethereum == null) {
     console.log("MetaMask not installed; using read-only defaults");
     provider = new ethers.providers.Web3Provider(window.ethereum);
+    const account = await provider.send("eth_requestAccounts", []);
+    return account[0]
   } else {
     provider = new ethers.providers.Web3Provider(window.ethereum);
     const account = await provider.send("eth_requestAccounts", []);
-    console.log("Connected to MetaMask account", account);
+    console.log("Connected to MetaMask account", account[0]);
     signer = await provider.getSigner();
+    return account[0]
   }
 };
 
@@ -30,6 +32,7 @@ async function enableButton() {
 const listNFT = async () => {
   disableButton() 
   console.log("fetching the response");
+  // Show a modal saying that the nft is being created and not to close the page or etc 
   const formData = new FormData(document.querySelector("form")); 
   try{
     
@@ -48,25 +51,29 @@ const listNFT = async () => {
         Marketplace.abi,
         signer
       );
-
-      //massage the params to be sent to the create NFT request
+ 
       const price = ethers.utils.parseUnits(formData.get('cost'), "ether");
        let listingPrice = await contract.getListPrice();
       listingPrice = listingPrice.toString();
-
-      //actually create the NFT
+ 
       let transaction = await contract.createToken(data.url, price, {
         value: listingPrice,
       });
       await transaction.wait();
 
       alert("Successfully listed your NFT!");
-      window.location.href = "/";
+      window.location.href = "/form"; 
+      enableButton()
     } else {
       alert("Error adding model");
-    }
- 
+      
+    } 
+    
   }catch(err){
+    alert("Error adding model");
     console.error(err)
+    // show a message to the user that the model was not added successfully
+
   }
 };
+
