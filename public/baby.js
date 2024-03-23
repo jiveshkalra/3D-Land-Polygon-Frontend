@@ -34,12 +34,12 @@ let ped;
 var floor;
 var light;
 var light_mult = 1;
-var startX = 0;
-var startY = 0;
-var currentX = 0;
-var currentY = 0;
-var maxX = 120;
-var maxY = 200;
+var startX = 40;
+var startY = 40;
+var currentX = 40;
+var currentY = 40;
+var maxX = 1000;
+var maxY = 20000;
 var pedestals = [];
 var textMarkers = [];
 let font;
@@ -48,25 +48,28 @@ const blocker = document.getElementById("blocker");
 const instructions = document.getElementById("instructions");
 var openedByTrigger = false;
 var keys = {};
+let video;
+let maxSize = 40;
+var sell_portal;
 //start app;
 init();
 animate();
 //function definitions
 
-const main= async () => {
+const main = async () => {
   let signer = null;
   let provider;
   if (window.ethereum == null) {
     console.log("MetaMask not installed; using read-only defaults");
     provider = new ethers.providers.Web3Provider(window.ethereum);
     const account = await provider.send("eth_requestAccounts", []);
-    return account[0]
+    return account[0];
   } else {
     provider = new ethers.providers.Web3Provider(window.ethereum);
     const account = await provider.send("eth_requestAccounts", []);
     console.log("Connected to MetaMask account", account[0]);
     signer = await provider.getSigner();
-    return account[0]
+    return account[0];
   }
 };
 
@@ -98,7 +101,15 @@ function createPedestal(url, objectCode) {
     objects.push(ped);
     new GLTFLoader().load(url, (mdl) => {
       mdl.scene.name = "";
-      mdl.scene.scale.set(0.1, 0.1, 0.1);
+      let sizeVec = new THREE.Vector3(0, 0, 0);
+      let bb = new THREE.Box3().setFromObject(mdl.scene);
+      bb.getSize(sizeVec);
+      let scaleRatio = 1;
+      let biggest = sizeVec.x;
+      if (sizeVec.y > sizeVec.x) biggest = sizeVec.y;
+      if (sizeVec.z > sizeVec.y) biggest = sizeVec.z;
+      scaleRatio = maxSize / biggest;
+      mdl.scene.scale.set(scaleRatio, scaleRatio, scaleRatio);
       models.push(mdl.scene);
       scene.add(mdl.scene);
     });
@@ -279,6 +290,9 @@ function createEventListeners() {
   document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
   window.addEventListener("resize", onWindowResize);
+  window.addEventListener("mousedown", () => {
+    video.play();
+  });
 }
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -309,8 +323,20 @@ function sceneAndCameraSetup() {
   scene.fog = new THREE.Fog(0xb0c87f, 1, 1000);
   window.scene = scene;
 }
+function correctPointInBox(pt, cube, boxDim) {
+  cube.geometry.computeBoundingBox();
+  cube.updateMatrixWorld(); //Make sure the object matrix is current with the position/rotation/scaling of the object...
+  var localPt = cube.worldToLocal(pt.clone()); //Transform the point from world space into the objects space
+  return cube.geometry.boundingBox.containsPoint(localPt);
+}
+function collider(self) {
+  if (correctPointInBox(controls.getObject().position, self))
+    window.location.href = window.location.origin + "/form";
+}
 //init function
 function init() {
+  video = document.createElement("video");
+  video.src = "./resources/vids/portal.mp4";
   sceneAndCameraSetup();
   light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 4.5);
   scene.add(light);
@@ -379,12 +405,71 @@ function init() {
 
   new GLTFLoader().load("./resources/gate/portal_frame.glb", (modl) => {
     let mdl = modl.scenes[0].children[0];
+    sell_portal = mdl;
     mdl.scale.set(0.5, 0.5, 0.5);
     mdl.position.y -= 30;
     mdl.position.z -= 200;
     mdl.position.x += 10;
-    console.log(mdl);
     scene.add(mdl);
+
+    new FontLoader().load(
+      "https://unpkg.com/three@0.157.0/examples/fonts/helvetiker_bold.typeface.json",
+      (res) => {
+        font = res;
+        let text = new THREE.Mesh(
+          new TextGeometry("Sell Your NFT!!", {
+            font: font,
+          }),
+          new THREE.MeshPhongMaterial({ color: 0x00ff80})
+        );
+        text.material.bumpMap = new THREE.TextureLoader().load('./resources/normal_Maps/download.jpeg');
+        text.material.bumpScale = 10;
+        window.font = font;
+        text.scale.set(0.1,0.1,0.05);
+        text.position.copy(sell_portal.position);
+        text.position.y = 180;
+        text.geometry.computeBoundingBox();
+        text.position.x -= 40;
+        text.lookAt(new THREE.Vector3(0,0,0));
+        text.name='txt';
+        scene.add(text)
+        console.log(text);
+
+      }
+    );
+
+    var geometry = new THREE.CylinderGeometry(
+      0.8 / Math.sqrt(2),
+      1 / Math.sqrt(2),
+      1,
+      4,
+      1
+    ); // size of top can be changed
+    geometry.rotateY(Math.PI / 4);
+    let coll = new THREE.Mesh(
+      geometry,
+      new THREE.MeshPhongMaterial({
+        color: 0xdddddd,
+        transparent: true,
+        emissive: 0x0000ff,
+        emissiveIntensity: 100,
+      })
+    );
+    let texture = new THREE.VideoTexture(
+      video,
+      THREE.RepeatWrapping,
+      undefined,
+      THREE.RepeatWrapping,
+      THREE.RepeatWrapping
+    );
+    coll.material.map = texture;
+    coll.material.emissiveMap = texture;
+    coll.scale.set(100, 150, 10);
+    coll.material.opacity = 0.95;
+    coll.update = collider;
+    coll.position.copy(mdl.position);
+    coll.position.y = 70;
+    scene.add(coll);
   });
 
   // createActualPedestal('https://gateway.pinata.cloud/ipfs/QmVZV2rFuYjapcHCgun4Uy2mdNf2gDWBAyp1PQE5Xuf9cp');
@@ -394,6 +479,10 @@ function init() {
 //mainLOOP
 function animate() {
   requestAnimationFrame(animate);
+  if (
+    controls.getObject().position.distanceTo(new THREE.Vector3(0, 0, 0)) > 1500
+  )
+    camera.position.set(0, 15, 0);
   const time = performance.now();
   pedestals = [];
   for (let child of scene.children) {
@@ -415,7 +504,7 @@ function animate() {
     models[i].position.x += 4;
     models[i].position.z -= 4;
     // console.log(i)
-    if (p.position.x == 0 && p.position.z == 0 && i != 0) {
+    if (p.position.x == 0 && p.position.z == 0) {
       p.position.x = currentX;
       p.position.z = currentY;
       p.children[0].position.x = currentX;
@@ -446,28 +535,29 @@ function animate() {
     const intersections1 = raycaster1.intersectObjects(objects, false);
     const triggersSteppedOn = raycaster3.intersectObjects(triggers, false);
     isTriggerSteppedOnThisFrame = triggersSteppedOn.length > 0;
- 
-    if (isTriggerSteppedOnThisFrame) stepTime += 0.01; 
+
+    if (isTriggerSteppedOnThisFrame) stepTime += 0.01;
     if (keys[80] && triggersSteppedOn.length > 0) {
-      let objectData = triggersSteppedOn[0].object.objectCode
+      let objectData = triggersSteppedOn[0].object.objectCode;
       document.querySelector("#price").innerText = objectData.price;
       document.querySelector("#name").innerText = objectData.model_name;
       document.querySelector("#desc").innerText = objectData.description;
       document.querySelector("#tokenid").innerText = objectData.tokenId;
       document.querySelector("#cat").innerText = objectData.category;
-      main().then( (res)=>{
-        const currentAddr =res;  
-        if (currentAddr != objectData.seller.toLowerCase() && currentAddr != objectData.owner.toLowerCase()){
-          document.querySelector("#purchasebtn").style='display:flex;'
-          document.querySelector("#alreadyOwned").style='display:none;'
+      main().then((res) => {
+        const currentAddr = res;
+        if (
+          currentAddr != objectData.seller.toLowerCase() &&
+          currentAddr != objectData.owner.toLowerCase()
+        ) {
+          document.querySelector("#purchasebtn").style = "display:flex;";
+          document.querySelector("#alreadyOwned").style = "display:none;";
+        } else {
+          document.querySelector("#purchasebtn").style = "display:none;";
+          document.querySelector("#alreadyOwned").style = "display:flex;";
         }
-        else{ 
-          document.querySelector("#purchasebtn").style='display:none;'
-          document.querySelector("#alreadyOwned").style='display:flex;'
-          
-        }
-      })
- 
+      });
+
       openedByTrigger = true;
       controls.unlock();
       stepTime = 0;
