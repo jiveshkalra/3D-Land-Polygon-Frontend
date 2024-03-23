@@ -47,6 +47,7 @@ let models = [];
 const blocker = document.getElementById("blocker");
 const instructions = document.getElementById("instructions");
 var openedByTrigger = false;
+var keys = {};
 //start app;
 init();
 animate();
@@ -206,6 +207,7 @@ function createEventListeners() {
   });
 
   const onKeyDown = function (event) {
+    keys[event.keyCode] = true;
     switch (event.code) {
       case "ArrowUp":
       case "KeyW":
@@ -235,6 +237,7 @@ function createEventListeners() {
   };
 
   const onKeyUp = function (event) {
+    keys[event.keyCode] = false;
     switch (event.code) {
       case "ArrowUp":
       case "KeyW":
@@ -332,7 +335,10 @@ function init() {
 
 
   new FBXLoader().load('./resources/gate/PortalThing.fbx', (mdl)=>{
-    mdl.position.x -= 10;
+    mdl.scale.set(0.5,0.5,0.5);
+    mdl.position.y -= 30;
+    mdl.position.z -= 200;
+    mdl.position.x += 10;
     scene.add(mdl);
   })
 
@@ -399,7 +405,8 @@ function animate() {
     isTriggerSteppedOnThisFrame = triggersSteppedOn.length > 0;
 
     if (isTriggerSteppedOnThisFrame) stepTime += 0.01;
-    if (stepTime > 1.0 && isTriggerSteppedOnThisFrame) {
+    console.log(keys)
+    if (keys[80] && triggersSteppedOn.length > 0) {
       console.log(triggersSteppedOn[0].object.objectCode);
       document.querySelector("#price").innerText =
         triggersSteppedOn[0].object.objectCode.price;
