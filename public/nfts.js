@@ -6,6 +6,23 @@ const GetIpfsUrlFromPinata = (pinataUrl) => {
   return IPFSUrl;
 };
 
+export const purchaseNFT = async ()=>{
+  const MarketplaceJSON = await fetch("/Marketplace").then((res) => res.json());
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const currentAddr = await signer.getAddress();
+  let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+  var tokenURI = await contract.tokenURI(tokenId);
+  const listedToken = await contract.getListedTokenForId(tokenId);
+  tokenURI = GetIpfsUrlFromPinata(tokenURI);
+  let response = await fetch(tokenURI);
+  let meta = await response.json();
+  meta = meta.data;
+  console.log(listedToken);
+
+
+}
+
 export const getAllNFTs = async () => {
   let data = [{}];
   const MarketplaceJSON = await fetch("/Marketplace").then((res) => res.json());

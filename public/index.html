@@ -44,7 +44,7 @@
           <p>Price: <span id="price"></span>MATIC</p>
           <p>Category: <span id="cat"></span></p>
           <p>Description: <span id="desc"></span></p>
-          <button onclick="console.log('plz add purchase function');" class="rounded-xl p-4 m-2 bg-teal-600 hover:bg-teal-500 active:bg-teal-300 absolute bottom-0 left-0 m-6">Purchase Now!!</button>
+          <button onclick="console.log('plz add purchase function');" class="rounded-xl p-4 m-2 bg-teal-600 hover:bg-teal-500 active:bg-teal-300 absolute bottom-0 left-0 m-6" id="purchasebtn">Purchase Now!!</button>
         </div>
       </div>
     </div>
@@ -54,6 +54,13 @@
   <!-- <script type="module" src="game.js"></script> -->
   <script type="module" src="baby.js"></script>
   <script src="form.js"></script>
+  <script> 
+    main().then(e => {
+      if (e) {
+        alert('Connected',e)
+      }
+    })
+  </script>
   <!-- <script type="module" src="script.js"></script> -->
 </body>
 
