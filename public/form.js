@@ -28,12 +28,13 @@ async function enableButton() {
   listButton.style.backgroundColor = "#A500FF";
   listButton.style.opacity = 1;
 }
-
+ 
 const listNFT = async () => {
   disableButton() 
   console.log("fetching the response");
   // Show a modal saying that the nft is being created and not to close the page or etc 
   const formData = new FormData(document.querySelector("form")); 
+  formData.append("seller_wallet", await main());
   try{
     
   let response = await fetch("/add", {

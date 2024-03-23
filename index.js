@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const fs = require("fs");
 const multer = require("multer");
-const pinataSDK = require("@pinata/sdk");
+const pinataSDK = require("@pinata/sdk"); 
 
 const cors = require("cors");
 app.use(cors());
@@ -20,6 +20,7 @@ const multer_storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage: multer_storage });
+const MarketplaceJSON = require("./public/Marketplace.json");
 
 const pinata_secret = process.env.PINATA_SECRET;
 const pinata_key = process.env.PINATA_KEY;
@@ -34,8 +35,9 @@ app.post("/add", upload.any(), (req, res) => {
   if (req.body) {
     let id = crypto.randomUUID();
     var entry = {
-      id: id,
       model_name: req.body.model_name,
+      id: id,
+      seller_wallet: req.body.seller_wallet,
       cost: req.body.cost,
       description: req.body.description,
       // tags: req.body.tags,
@@ -93,12 +95,11 @@ app.post("/add", upload.any(), (req, res) => {
     res.status(400).send("Invalid request body");
   }
 });
-
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 app.get("/form", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/form.html"));
+  res.sendFile(path.join(__dirname, "public/form.html")); 
 });
 app.get("/Marketplace", (req, res) => {
   res.sendFile(path.join(__dirname, "public/Marketplace.json"));
