@@ -5,7 +5,7 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import {getAllNFTs} from "./nfts.js"
+import { getAllNFTs } from "./nfts.js";
 window.textGeo = TextGeometry;
 window.three = THREE;
 // window.createPedestal = createActualPedestal;
@@ -81,14 +81,14 @@ function createPedestal(url, objectCode) {
     objects.push(ped);
     new GLTFLoader().load(url, (mdl) => {
       mdl.scene.name = "";
-      mdl.scene.scale.set(0.1,0.1,0.1);
+      mdl.scene.scale.set(0.1, 0.1, 0.1);
       models.push(mdl.scene);
       scene.add(mdl.scene);
     });
     createTrigger(ped, objectCode);
   });
 }
- 
+
 // async function createActualPedestal(url_json){
 //   let res = await fetch(url_json);
 //   let data = await res.json();
@@ -96,16 +96,15 @@ function createPedestal(url, objectCode) {
 //   console.log(data);
 // }
 
-async function loadAllPedestals(){
-  let data = await getAllNFTs()
-  data.map((d)=>{
-    try{
+async function loadAllPedestals() {
+  let data = await getAllNFTs();
+  data.map((d) => {
+    try {
       createPedestal(d.model_url, d);
+    } catch (err) {
+      console.log(err);
     }
-    catch(err){
-      console.log(err)
-    }
-  })
+  });
 }
 function textScript(self) {
   // self.lookAt(camera.position);
@@ -178,31 +177,30 @@ function createFloor() {
   scene.add(floor);
 }
 function createEventListeners() {
-
-  document.getElementById('playBtn').addEventListener("click", function () {
+  document.getElementById("playBtn").addEventListener("click", function () {
     controls.lock();
-    document.querySelector('#modal').style.display = 'none';
+    document.querySelector("#modal").style.display = "none";
   });
-  document.getElementById('close').addEventListener("click", function () {
+  document.getElementById("close").addEventListener("click", function () {
     controls.lock();
-    document.querySelector('#modal').style.display = 'none';
+    document.querySelector("#modal").style.display = "none";
   });
 
   controls.addEventListener("lock", function () {
-    instructions.style.display = 'none';
-    document.querySelector('#modal').style.display = 'none';
+    instructions.style.display = "none";
+    document.querySelector("#modal").style.display = "none";
   });
 
   controls.addEventListener("unlock", function () {
-    document.querySelector('#modal').style.display = 'none';
-    instructions.style.display = 'block';
-    if(openedByTrigger){
-      document.querySelector('#info').style.display = 'block';
-      document.querySelector('#playBtn').style.display = 'none';
+    document.querySelector("#modal").style.display = "none";
+    instructions.style.display = "block";
+    if (openedByTrigger) {
+      document.querySelector("#info").style.display = "block";
+      document.querySelector("#playBtn").style.display = "none";
       openedByTrigger = false;
-    }else{
-      document.querySelector('#info').style.display = 'none';
-      document.querySelector('#playBtn').style.display = 'block';
+    } else {
+      document.querySelector("#info").style.display = "none";
+      document.querySelector("#playBtn").style.display = "block";
     }
   });
 
@@ -331,21 +329,55 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  // new FBXLoader().load("./resources/gate/PortalThing.fbx", (modl) => {
+  //   let  mdl = modl.children[0];
+  //   // mdl.scale.set(0.5, 0.5, 0.5);
+  //   // mdl.position.y -= 30;
+  //   // mdl.position.z -= 200;
+  //   // mdl.position.x += 10;
+  //   console.log(mdl)
+  //   mdl.material.map = new THREE.TextureLoader().load(
+  //     "./resources/gate/T_PortalFrame_Normal.png"
+  //   );
+  //   mdl.material.normalMap = new THREE.TextureLoader().load(
+  //     "./resources/gate/T_PortalFrame_Normal.png"
+  //   );
+  //   mdl.material.metalnessMap = new THREE.TextureLoader().load(
+  //     "./resources/gate/T_PortalFrame_Metallic.png"
+  //   );
+  //   mdl.material.aoMap = new THREE.TextureLoader().load(
+  //     "./resources/gate/T_PortalFrame_AO.png"
+  //   );
+  //   mdl.material.roughnessMap = new THREE.TextureLoader().load(
+  //     "./resources/gate/T_PortalFrame_Roughness.png"
+  //   );
 
+  //   mdl.material.emissiveIntensity = 0.5;
+  //   mdl.material.emissive = new THREE.Color(100, 100, 100);
+  //   mdl.material.emissiveMap = new THREE.TextureLoader().load(
+  //     "./resources/gate/T_PortalFrame_Emissive.png"
+  //   );
+  //   scene.add(mdl);
+  // });
 
-
-  new FBXLoader().load('./resources/gate/PortalThing.fbx', (mdl)=>{
-    mdl.scale.set(0.5,0.5,0.5);
+  new GLTFLoader().load("./resources/gate/portal_frame.glb", (modl) => {
+    let mdl = modl.scenes[0].children[0];
+    mdl.scale.set(0.5, 0.5, 0.5);
     mdl.position.y -= 30;
     mdl.position.z -= 200;
     mdl.position.x += 10;
+    console.log(mdl);
     scene.add(mdl);
-  })
-
-
+    let coll = new THREE.Mesh(new THREE.BoxGeometry(100,400,10), new THREE.MeshBasicMaterial({color:0x00ffff, transparent:true}))
+    coll.material.opacity = 0;
+    coll.position.y = 0;
+    
+    coll.position.copy(mdl.position);
+    scene.add(coll);
+  });
 
   // createActualPedestal('https://gateway.pinata.cloud/ipfs/QmVZV2rFuYjapcHCgun4Uy2mdNf2gDWBAyp1PQE5Xuf9cp');
-  loadAllPedestals()
+  loadAllPedestals();
   scene.createPedestal = createPedestal;
 }
 //mainLOOP
@@ -355,10 +387,10 @@ function animate() {
   pedestals = [];
   for (let child of scene.children) {
     if (child.update) child.update(child);
-    if (child.children.length > 0 && child.isMesh ) {
+    if (child.children.length > 0 && child.isMesh) {
       pedestals.push(child);
     }
-  } 
+  }
   if (currentX > maxX) {
     currentX = parseFloat(startX.toString());
     currentY += 40;
@@ -405,18 +437,17 @@ function animate() {
     isTriggerSteppedOnThisFrame = triggersSteppedOn.length > 0;
 
     if (isTriggerSteppedOnThisFrame) stepTime += 0.01;
-    console.log(keys)
     if (keys[80] && triggersSteppedOn.length > 0) {
       console.log(triggersSteppedOn[0].object.objectCode);
       document.querySelector("#price").innerText =
         triggersSteppedOn[0].object.objectCode.price;
-        document.querySelector("#name").innerText =
+      document.querySelector("#name").innerText =
         triggersSteppedOn[0].object.objectCode.model_name;
-        document.querySelector("#desc").innerText =
+      document.querySelector("#desc").innerText =
         triggersSteppedOn[0].object.objectCode.description;
-        document.querySelector("#cat").innerText =
+      document.querySelector("#cat").innerText =
         triggersSteppedOn[0].object.objectCode.category;
-        openedByTrigger = true;
+      openedByTrigger = true;
       controls.unlock();
       stepTime = 0;
     }
