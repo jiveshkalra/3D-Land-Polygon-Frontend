@@ -7,49 +7,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Form</title>  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
     type="application/javascript"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
 </script>
     <script src="./form.js" ></script>
   </head>
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #dedaeb; 
+    }
+    nav{
+      position: absolute;
+      top: 0; 
+      width: 100%;
+      display: flex;
+      max-height: 80px;
+      background-color: #694ACA;
+    } 
+    .nav_heading{
+      color: #F4F1FB;
+    }
+    .nav_sites_btn{
+      color: #F4F1FB;
+      background-color: #9174FE; 
+    }
+    .uploadNFTform{ 
+      background-color: #ffffff; 
+      padding: 10px; 
+      border-radius: 20px; 
+      flex-direction: column;
+      color:#140A10;
+    }
+  </style>
   <body>
-    <h1>Current Wallet : (add the the account[0] from the main function here  )</h1>
-    <h1>Upload your 3d Model as NFT in the marketplace</h1>
+
+    <nav class="py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="p-5 text-3xl font-bold nav_heading">Web3DLand</h1>
+        <ul class="flex space-x-4">
+          <li>
+            <a class="py-2 px-4  text-lg nav_sites_btn font-semibold rounded" href="./">Marketplace</a>
+          </li>
+          <li>
+            <a class="py-2 px-4 text-lg nav_sites_btn font-semibold rounded active" href="./form">Mint NFT</a>
+          </li>
+        </ul>
+        <script>
+          const checkWalletConnection = async  () =>{  
+          provider = new ethers.providers.Web3Provider(window.ethereum);
+          const account = await provider.send("eth_requestAccounts", []) 
+          if (typeof account[0] !== 'undefined'  && account[0].length > 0) {
+              const isConnected = true;               
+                document.getElementById("wallet-button").innerText = "Logged In: " + account[0].slice(0, 5) + "..." + account[0].slice(-5);
+          }else{
+                  const isConnected = false;
+                  document.getElementById("wallet-button").innerText = "Connect to wallet";  
+            };
+          }
+        </script>
+
+        <button class="nav_sites_btn py-2 px-4 rounded font-semibold" onclick="main()" id="wallet-button">Connect to wallet</button>
+
+        <script>
+          checkWalletConnection();
+        </script>
+      </div>
+    </nav>
+ 
+
+    
+    <div class="uploadNFTform flex justify-content items-center py-16 px-10">
+    <!-- <h1>Current Wallet : (add the the account[0] from the main function here  )</h1> -->
+    <h1 class="formheading text-3xl m-5 font-semibold">UPLOAD MODEL IN MARKETPLACE</h1>
     <form onsubmit="event.preventDefault(); return false;">
-      <label for="model_name">Model Name:</label> 
-      <input type="text" id="model_name" name="model_name" placeholder="Apple" required />
-      <i>Enter Name of 3d model.</i><br>
+      <div>
+        <label for="model_name">Model Name:</label> 
+        <input type="text" id="model_name" name="model_name" placeholder="Apple" required />
+        <i>Enter Name of 3d model.</i><br>
+      </div>
+      <div>
+        <label for="cost">Cost:</label> 
+        <input type="number" step="0.01" id="cost" name="cost" required placeholder="0.01" pattern="[0-9]+(\.[0-9]{1,2})?" />
+        <i>Enter Cost of 3d model (in MATIC coins)</i><br>
+      </div>
+      <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <i>Description of the model</i><br>
+      </div>
       
-      
-      <label for="cost">Cost:</label>
-      <!-- Make it so that this only accepts numerical inputs in decimals -->
-      <input type="number" step="0.01" id="cost" name="cost" required placeholder="0.01"  />
-      <i>Enter Cost of 3d model (in MATIC coins)</i><br>
-      
-      <label for="description">Description:</label>
-      <textarea id="description" name="description" required></textarea>
-      <i>Description of the model</i><br>
-      
-      <label for="model_file">Model File:</label>
-      <input
-        type="file"
-        id="model_file"
-        name="model_file"
-        accept=".glb"
-        required
-        />
-        <i>Only .glb files are accepted</i><br>
+      <div>
+        <label for="category">Category:</label> 
+        <select id="category" name="category" required>
+          <option value="">Select a category</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Art">Art</option>
+          <option value="Toys">Toys</option>
+        </select> 
+      </div> 
         
+    <div class="flex items-center justify-center w-full">
+      <label for="model_file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50  ">
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg class="w-8 h-8 mb-4 text-gray-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+              </svg>
+              <p class="mb-2 text-sm text-gray-500 "><span class="font-semibold">Click to upload</span> or drag and drop</p>
+              <p class="text-xs text-gray-500 "> .GLB , .FBX , .OBJ , .GTLF  </p>
+          </div>
+          <input id="model_file" type="file" class="hidden"
+          name="model_file"
+          accept=".glb"
+          required />
+      </label>
+    </div>  
+              
         
-        <label for="category">Category:</label>
-        <!--Make this a select box and add some categories in the options --> 
-        <input type="text" id="category"  name="category" required /> 
-        <i>enter category of the model</i><br>
       <span id="showMsg"></span>
       <button onclick="listNFT()" id="list-button" value="Submit">
         <!-- Make it that whenever you open the page , a popup comes, you have to go through the connection of wallet before accessing the site else it will not let you mint nft--> 
         Mint Your NFT
       </button>
     </form>
-    <button onclick="main()">Connect to wallet</button>
+  </div>
  
   </body>
 </html>

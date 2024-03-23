@@ -346,7 +346,6 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-<<<<<<< Updated upstream
   // new FBXLoader().load("./resources/gate/PortalThing.fbx", (modl) => {
   //   let  mdl = modl.children[0];
   //   // mdl.scale.set(0.5, 0.5, 0.5);
@@ -380,24 +379,12 @@ function init() {
 
   new GLTFLoader().load("./resources/gate/portal_frame.glb", (modl) => {
     let mdl = modl.scenes[0].children[0];
-=======
-  new FBXLoader().load("./resources/gate/PortalThing.fbx", (mdl) => {
->>>>>>> Stashed changes
     mdl.scale.set(0.5, 0.5, 0.5);
     mdl.position.y -= 30;
     mdl.position.z -= 200;
     mdl.position.x += 10;
     console.log(mdl);
     scene.add(mdl);
-<<<<<<< Updated upstream
-    let coll = new THREE.Mesh(new THREE.BoxGeometry(100,400,10), new THREE.MeshBasicMaterial({color:0x00ffff, transparent:true}))
-    coll.material.opacity = 0;
-    coll.position.y = 0;
-    
-    coll.position.copy(mdl.position);
-    scene.add(coll);
-=======
->>>>>>> Stashed changes
   });
 
   // createActualPedestal('https://gateway.pinata.cloud/ipfs/QmVZV2rFuYjapcHCgun4Uy2mdNf2gDWBAyp1PQE5Xuf9cp');
@@ -459,42 +446,27 @@ function animate() {
     const intersections1 = raycaster1.intersectObjects(objects, false);
     const triggersSteppedOn = raycaster3.intersectObjects(triggers, false);
     isTriggerSteppedOnThisFrame = triggersSteppedOn.length > 0;
-
-<<<<<<< Updated upstream
-    if (isTriggerSteppedOnThisFrame) stepTime += 0.01;
-    if (keys[80] && triggersSteppedOn.length > 0) {
-      console.log(triggersSteppedOn[0].object.objectCode);
-      document.querySelector("#price").innerText =
-        triggersSteppedOn[0].object.objectCode.price;
-      document.querySelector("#name").innerText =
-        triggersSteppedOn[0].object.objectCode.model_name;
-      document.querySelector("#desc").innerText =
-        triggersSteppedOn[0].object.objectCode.description;
-      document.querySelector("#cat").innerText =
-        triggersSteppedOn[0].object.objectCode.category;
-=======
+ 
     if (isTriggerSteppedOnThisFrame) stepTime += 0.01; 
     if (keys[80] && triggersSteppedOn.length > 0) {
       let objectData = triggersSteppedOn[0].object.objectCode
       document.querySelector("#price").innerText = objectData.price;
       document.querySelector("#name").innerText = objectData.model_name;
       document.querySelector("#desc").innerText = objectData.description;
+      document.querySelector("#tokenid").innerText = objectData.tokenId;
       document.querySelector("#cat").innerText = objectData.category;
-      main().then((res)=>{
-        const currentAddr =res;
-        console.log(objectData.owner.toLowerCase())
-        console.log(currentAddr)
-        console.log(objectData.seller.toLowerCase())
+      main().then( (res)=>{
+        const currentAddr =res;  
         if (currentAddr != objectData.seller.toLowerCase() && currentAddr != objectData.owner.toLowerCase()){
-          // Purchasing logic here  
+          document.querySelector("#purchasebtn").style='display:flex;'
+          document.querySelector("#alreadyOwned").style='display:none;'
         }
-        else{
+        else{ 
           document.querySelector("#purchasebtn").style='display:none;'
           
         }
       })
-
->>>>>>> Stashed changes
+ 
       openedByTrigger = true;
       controls.unlock();
       stepTime = 0;
