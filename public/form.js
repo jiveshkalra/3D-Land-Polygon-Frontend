@@ -19,20 +19,26 @@ const main= async () => {
 async function disableButton() {
   const listButton = document.getElementById("list-button");
   listButton.disabled = true;
-  listButton.style.backgroundColor = "grey";
+  listButton.style.backgroundColor = "#797D7F";
   listButton.style.opacity = 0.3;
 }
 async function enableButton() {
   const listButton = document.getElementById("list-button");
   listButton.disabled = false;
-  listButton.style.backgroundColor = "#A500FF";
+  listButton.style.backgroundColor = "#694ACA";
   listButton.style.opacity = 1;
 }
  
+const returnError =(message)=>{ 
+  closeLoadingModal()
+  document.getElementById('error-modal').classList.remove('hidden');
+  document.getElementById('errorMessage').innerText = message;
+}
 const listNFT = async () => {
+  document.getElementById('loading-modal').classList.remove('hidden');
+  
   disableButton() 
-  console.log("fetching the response");
-  // Show a modal saying that the nft is being created and not to close the page or etc 
+  console.log("fetching the response"); 
   const formData = new FormData(document.querySelector("form")); 
   formData.append("seller_wallet", await main());
   try{
@@ -41,10 +47,10 @@ const listNFT = async () => {
     method: "POST",
     body: formData,
   }) 
+  
   const Marketplace = await fetch("/Marketplace").then((res) => res.json());
   let data =  await response.json()   
-    if (data.status == "success") {
-      console.log("Model added successfully");
+    if (data.status == "success") { 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       let contract = new ethers.Contract(
@@ -58,23 +64,24 @@ const listNFT = async () => {
       listingPrice = listingPrice.toString();
  
       let transaction = await contract.createToken(data.url, price, {
+         
         value: listingPrice,
       });
       await transaction.wait();
-
-      alert("Successfully listed your NFT!");
+ 
+      document.getElementById('success-modal').classList.remove('hidden');
+      closeLoadingModal()
       window.location.href = "/form"; 
       enableButton()
     } else {
-      alert("Error adding model");
+      // returnError(data.err)
+      returnError("Oops! Some error occured, please try again later or contact us if the problem still persist") 
       
     } 
     
-  }catch(err){
-    alert("Error adding model");
-    console.error(err)
-    // show a message to the user that the model was not added successfully
-
+  }catch(err){ 
+    returnError("Oops! Some error occured, please try again later or contact us if the problem still persist") 
+    // returnError(err) 
   }
 };
 

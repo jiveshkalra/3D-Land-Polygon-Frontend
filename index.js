@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const fs = require("fs");
 const multer = require("multer");
-const pinataSDK = require("@pinata/sdk"); 
+const pinataSDK = require("@pinata/sdk");
 
 const cors = require("cors");
 app.use(cors());
@@ -30,7 +30,26 @@ app.use(express.static("public"));
 
 app.post("/add", upload.any(), (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send("No files were uploaded.");
+    return res
+      .status(400)
+      .send({
+        err: "No files were uploaded. Please upload the model file and try again. ",
+        status: "failed",
+      });
+  }
+  if (
+    !req.body.model_name ||
+    !req.body.seller_wallet ||
+    !req.body.cost ||
+    !req.body.description ||
+    !req.body.category
+  ) {
+    return res
+      .status(400)
+      .send({
+        err: "Please fill all the fields and try again. ",
+        status: "failed",
+      });
   }
   if (req.body) {
     let id = crypto.randomUUID();
@@ -82,24 +101,37 @@ app.post("/add", upload.any(), (req, res) => {
             console.log(json_url);
             return res.status(200).send({ url: json_url, status: "success" });
           })
-          .catch((err) => {
-            console.log(err);
-            return res.status(500).send({ err: err, status: "failed" });
+          .catch((err) => {  
+            return res
+              .status(500)
+              .send({
+                err: "Oops! something went wrong with uploading your model,please try again later or contact us if the problem still persist ",
+                status: "failed",
+              });
           });
       })
       .catch((err) => {
-        console.log(err);
-        return res.status(500).send({ err: err, status: "failed" });
+        return res
+          .status(500)
+          .send({
+            err: "Oops! something went wrong with uploading your model,please try again later or contact us if the problem still persist ",
+            status: "failed",
+          });
       });
   } else {
-    res.status(400).send("Invalid request body");
+    return res
+      .status(500)
+      .send({
+        err: "Oops! something went wrong with uploading your model,please try again later or contact us if the problem still persist ",
+        status: "failed",
+      });
   }
 });
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 app.get("/form", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/form.html")); 
+  res.sendFile(path.join(__dirname, "public/form.html"));
 });
 app.get("/Marketplace", (req, res) => {
   res.sendFile(path.join(__dirname, "public/Marketplace.json"));
