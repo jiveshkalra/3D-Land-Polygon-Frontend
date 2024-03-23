@@ -44,6 +44,9 @@ var pedestals = [];
 var textMarkers = [];
 let font;
 let models = [];
+const blocker = document.getElementById("blocker");
+const instructions = document.getElementById("instructions");
+var openedByTrigger = false;
 //start app;
 init();
 animate();
@@ -174,21 +177,32 @@ function createFloor() {
   scene.add(floor);
 }
 function createEventListeners() {
-  const blocker = document.getElementById("blocker");
-  const instructions = document.getElementById("instructions");
 
-  instructions.addEventListener("click", function () {
+  document.getElementById('playBtn').addEventListener("click", function () {
     controls.lock();
+    document.querySelector('#modal').style.display = 'none';
+  });
+  document.getElementById('close').addEventListener("click", function () {
+    controls.lock();
+    document.querySelector('#modal').style.display = 'none';
   });
 
   controls.addEventListener("lock", function () {
-    instructions.style.display = "none";
-    blocker.style.display = "none";
+    instructions.style.display = 'none';
+    document.querySelector('#modal').style.display = 'none';
   });
 
   controls.addEventListener("unlock", function () {
-    blocker.style.display = "block";
-    instructions.style.display = "";
+    document.querySelector('#modal').style.display = 'none';
+    instructions.style.display = 'block';
+    if(openedByTrigger){
+      document.querySelector('#info').style.display = 'block';
+      document.querySelector('#playBtn').style.display = 'none';
+      openedByTrigger = false;
+    }else{
+      document.querySelector('#info').style.display = 'none';
+      document.querySelector('#playBtn').style.display = 'block';
+    }
   });
 
   const onKeyDown = function (event) {
@@ -314,6 +328,16 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+
+
+
+  new FBXLoader().load('./resources/gate/PortalThing.fbx', (mdl)=>{
+    mdl.position.x -= 10;
+    scene.add(mdl);
+  })
+
+
+
   // createActualPedestal('https://gateway.pinata.cloud/ipfs/QmVZV2rFuYjapcHCgun4Uy2mdNf2gDWBAyp1PQE5Xuf9cp');
   loadAllPedestals()
   scene.createPedestal = createPedestal;
@@ -377,8 +401,15 @@ function animate() {
     if (isTriggerSteppedOnThisFrame) stepTime += 0.01;
     if (stepTime > 1.0 && isTriggerSteppedOnThisFrame) {
       console.log(triggersSteppedOn[0].object.objectCode);
-      document.querySelector("#info").innerText =
-        triggersSteppedOn[0].object.objectCode.cost;
+      document.querySelector("#price").innerText =
+        triggersSteppedOn[0].object.objectCode.price;
+        document.querySelector("#name").innerText =
+        triggersSteppedOn[0].object.objectCode.model_name;
+        document.querySelector("#desc").innerText =
+        triggersSteppedOn[0].object.objectCode.description;
+        document.querySelector("#cat").innerText =
+        triggersSteppedOn[0].object.objectCode.category;
+        openedByTrigger = true;
       controls.unlock();
       stepTime = 0;
     }

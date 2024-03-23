@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
+
 <body>
-  
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
-        type="application/javascript"></script>
-<script type="importmap">
+
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="importmap">
   {
 		"imports": {
 			"three": "https://unpkg.com/three@0.157.0/build/three.module.js",
@@ -20,22 +25,36 @@
 		}
 	}
 </script>
-<div id="blocker">
-  <div id="instructions">
-    <button id='playBtn' style="font-size:36px">
-      Click to play
-    </button>
-    <p id="info" style="color:black">
-      Move: WASD<br/>
-      Jump: SPACE<br/>
-      Look: MOUSE
-    </p>
+  <div id="blocker">
+    <div id="instructions" class="w-screen h-screen">
+      <button id="playBtn" class="p-0 m-0 w-screen h-screen text-[10vmin]">Click Anywhere To Enter 3D NFT Land</button>
+      <button id="settings"
+        onclick='document.getElementById("modal").style.display = document.getElementById("modal").style.display == "block"? "none" : "block"'
+        class="absolute p-4 m-6 bg-purple-800 hover:bg-purple-700 active:bg-purple-500 rounded-lg bottom-0 right-0"><span
+          class="material-symbols-outlined">
+          settings
+        </span></button>
+        <div style='display: none;' id="modal" class="absolute bg-slate-400 bottom-[100px] right-0 p-4 m-6">
+          <button onclick="main().then(e=>{if(e){alert('Connected')}})">Connect Your Wallet</button>
+        </div>
+      <div id="info" style="display: none;">
+        <button id="close" class="absolute right-0 w-[5vw] text-center p-6 hover:bg-red-700">X</button>
+        <div class="max-w-[95vw] p-4 text-3xl">
+          <p>Name: <span id="name"></span></p>
+          <p>Price: <span id="price"></span>MATIC</p>
+          <p>Category: <span id="cat"></span></p>
+          <p>Description: <span id="desc"></span></p>
+          <button onclick="console.log('plz add purchase function');" class="rounded-xl p-4 m-2 bg-teal-600 hover:bg-teal-500 active:bg-teal-300 absolute bottom-0 left-0 m-6">Purchase Now!!</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- <script type="module" src="main.js"></script> -->
-<!-- <script type="module" src="game.js"></script> -->
-<script type="module" src="baby.js"></script> 
-<!-- <script type="module" src="script.js"></script> -->
+  <!-- <script type="module" src="main.js"></script> -->
+  <!-- <script type="module" src="game.js"></script> -->
+  <script type="module" src="baby.js"></script>
+  <script src="form.js"></script>
+  <!-- <script type="module" src="script.js"></script> -->
 </body>
+
 </html>
