@@ -210,9 +210,9 @@ function createEventListeners() {
 
   controls.addEventListener("unlock", function () {
     document.querySelector("#modal").style.display = "none";
-    instructions.style.display = "block";
+    instructions.style.display = "flex";
     if (openedByTrigger) {
-      document.querySelector("#info").style.display = "block";
+      document.querySelector("#info").style.display = "flex";
       document.querySelector("#playBtn").style.display = "none";
       openedByTrigger = false;
     } else {
@@ -463,6 +463,7 @@ function animate() {
         }
         else{ 
           document.querySelector("#purchasebtn").style='display:none;'
+          document.querySelector("#alreadyOwned").style='display:flex;'
           
         }
       })

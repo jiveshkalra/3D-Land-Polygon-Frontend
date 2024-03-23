@@ -30,10 +30,31 @@
         }
       }
     </script>
+    <style>
+      .purchase-div{  
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #1a202c;
+        border-radius: 10px;
+        padding: 20px; 
+        
+
+      }
+      #info{ flex-direction: row-reverse;     }
+      .item-entry{
+        margin-top: 5px;
+        margin-bottom: 5px;
+        margin-left: 10px;
+        margin-right: 10px;
+
+      }
+    </style>
     <div id="blocker">
       <div id="instructions" class="w-screen h-screen">
         <button id="playBtn" class="p-0 m-0 w-screen h-screen text-[10vmin]">
-          Click Anywhere To Enter 3D NFT Land
+          Click Anywhere To Enter Web3DLand
         </button>
         <button
           id="settings"
@@ -43,37 +64,39 @@
           <span class="material-symbols-outlined"> settings </span>
         </button>
         <div
-          style="display: none"
-          id="modal"
+        style="display: none"
+        id="modal"
           class="absolute bg-slate-400 bottom-[100px] right-0 p-4 m-6"
-        >
+          >
           <button onclick="()=>{main().then(e=>{if(e){alert('Connected')}})}">
             Connect Your Wallet
           </button>
         </div>
-        <!-- <div id="info" style="display: none"> -->
-        <div id="info">
-          <button
-            id="close"
-            class="absolute right-0 w-[5vw] text-center p-6 hover:bg-red-700"
-          >
-            X
-          </button>
-          <div class="max-w-[95vw] p-4 text-3xl">
-            <p>Name: <span id="name"></span></p>
-            <p>TokenId: <span id="tokenid"></span></p>
-            <p>Price: <span id="price"></span>MATIC</p>
-            <p>Category: <span id="cat"></span></p>
-            <p>Description: <span id="desc"></span></p>
-            <button
-              onclick="purchase();"
-              class="rounded-xl p-4 m-2 bg-teal-600 hover:bg-teal-500 active:bg-teal-300 absolute bottom-0 left-0 m-6"
-              id="purchasebtn"
+        <div class="w-full h-full flex justify-center items-center">
+          <div id="info" style="display: none" class="purchase-div">
+             <button
+              id="close"
+              class="rounded text-center p-6 hover:bg-red-700 h-full"
             >
-              Purchase Now!!
+              X
             </button>
-            <div id="alreadyOwned" className="text-emerald-700">
-              You are the owner of this NFT
+            <div class="max-w-[95vw] p-4 text-3xl">
+              <p class="item-entry font-semibold">NAME : <span id="name" class="font-medium"></span></p>
+              <p class="item-entry font-semibold">TOKEN ID : <span id="tokenid" class="font-medium"></span></p>
+              <p class="item-entry font-semibold">PRICE : <span id="price" class="font-medium"></span> MATIC</p>
+              <p class="item-entry font-semibold">CATEGORY: <span id="cat" class="font-medium"></span></p>
+              <p class="item-entry font-semibold">DESCRIPTION: <span id="desc" class="font-medium"></span></p>
+              <hr class="h-px my-8  border-0  bg-gray-700">
+              <button
+                onclick="purchase();"
+                class="rounded-xl p-4 m-2 bg-teal-600 hover:bg-teal-500 active:bg-teal-300 absolute bottom-0 left-0 m-6"
+                id="purchasebtn"
+              >
+                Purchase Now!!
+              </button>
+              <div id="alreadyOwned" class="item-entry text-emerald-700">
+                You are the owner of this NFT
+              </div>
             </div>
           </div>
         </div>
