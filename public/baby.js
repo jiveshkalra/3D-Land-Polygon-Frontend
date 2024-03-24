@@ -76,6 +76,8 @@ const main = async () => {
   }
 };
 
+addEventListener('DOMContentLoaded', main);
+
 function createPedestal(url, objectCode) {
   let fbxloader = new FBXLoader();
   fbxloader.load("./resources/pedestal/source/Pedestal_low.fbx", (model) => {
