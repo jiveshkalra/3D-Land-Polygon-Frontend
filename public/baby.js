@@ -51,6 +51,9 @@ var keys = {};
 let video;
 let maxSize = 40;
 var sell_portal;
+let foliagePack;
+let folList = [];
+let no_of_instances_per_foliage = 10000;
 //start app;
 init();
 animate();
@@ -174,7 +177,7 @@ function createTrigger(pedestal, objectCode) {
 }
 function createFloor() {
   // floor
-  let scale = 2;
+  let scale = 0.5;
   let floorGeometry = new THREE.PlaneGeometry(
     2000 * scale,
     2000 * scale,
@@ -203,6 +206,23 @@ function createFloor() {
   floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
   scene.add(floor);
+
+  let border = new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshBasicMaterial({color:0x104fe3}));
+  border.scale.set(600,600 ,600);
+  border.position.y -= 200;
+  border.material.side = THREE.BackSide;
+  scene.add(border);
+
+  new GLTFLoader().load('./resources/foliage/low_poly_foliage_pack_01.glb', (fol)=>{
+    foliagePack = fol.scene;
+    foliagePack.scale.set(10,10,10)
+    let Geom = foliagePack[0].geometry;
+    let Mate = foliagePack[0].material;
+    let instMesh = new THREE.InstancedMesh(Geom,Mate,no_of_instances_per_foliage);
+    
+    // scene.add(instMesh);
+  });
+
 }
 function createEventListeners() {
   document.getElementById("playBtn").addEventListener("click", function () {
@@ -305,7 +325,7 @@ function sceneAndCameraSetup() {
     75,
     window.innerWidth / window.innerHeight,
     0.01,
-    1000
+    2000
   );
   camera.position.y = 10;
 
@@ -319,11 +339,12 @@ function sceneAndCameraSetup() {
     "./resources/posz.jpg",
     "./resources/negz.jpg",
   ]);
-  scene.background = texture;
-  scene.fog = new THREE.Fog(0xb0c87f, 1, 1000);
+  // scene.background = texture;
+  // scene.background = new THREE.Color(0x104fe3);
+  scene.fog = new THREE.Fog(0xddddff, 0.0, 800.0);
   window.scene = scene;
 }
-function correctPointInBox(pt, cube, boxDim) {
+function correctPointInBox(pt, cube) {
   cube.geometry.computeBoundingBox();
   cube.updateMatrixWorld(); //Make sure the object matrix is current with the position/rotation/scaling of the object...
   var localPt = cube.worldToLocal(pt.clone()); //Transform the point from world space into the objects space
@@ -336,49 +357,51 @@ function collider(self) {
 //init function
 function init() {
   video = document.createElement("video");
-  video.src = "./resources/vids/portal.mp4";
+  video.src = "./resources/vids/vid01.mp4";
+  video.loop = true;
+  video.autoplay = true;
   sceneAndCameraSetup();
   light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 4.5);
   scene.add(light);
-
+  
   controls = new PointerLockControls(camera, document.body);
   scene.add(controls.getObject());
-
+  
   createEventListeners();
-
+  
   raycaster1 = new THREE.Raycaster(
     new THREE.Vector3(),
     new THREE.Vector3(0, -1, 0),
     0,
     10
-  );
-  raycaster2 = new THREE.Raycaster(
-    new THREE.Vector3(),
+    );
+    raycaster2 = new THREE.Raycaster(
+      new THREE.Vector3(),
+      new THREE.Vector3(0, -1, 0),
+      0,
+      5
+      );
+      raycaster3 = new THREE.Raycaster(
+        new THREE.Vector3(),
     new THREE.Vector3(0, -1, 0),
     0,
     5
-  );
-  raycaster3 = new THREE.Raycaster(
-    new THREE.Vector3(),
-    new THREE.Vector3(0, -1, 0),
-    0,
-    5
-  );
-
-  createFloor();
-
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  // new FBXLoader().load("./resources/gate/PortalThing.fbx", (modl) => {
-  //   let  mdl = modl.children[0];
-  //   // mdl.scale.set(0.5, 0.5, 0.5);
-  //   // mdl.position.y -= 30;
-  //   // mdl.position.z -= 200;
-  //   // mdl.position.x += 10;
-  //   console.log(mdl)
+    );
+    
+    createFloor();
+    
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    
+    // new FBXLoader().load("./resources/gate/PortalThing.fbx", (modl) => {
+      //   let  mdl = modl.children[0];
+      //   // mdl.scale.set(0.5, 0.5, 0.5);
+      //   // mdl.position.y -= 30;
+      //   // mdl.position.z -= 200;
+      //   // mdl.position.x += 10;
+      //   console.log(mdl)
   //   mdl.material.map = new THREE.TextureLoader().load(
   //     "./resources/gate/T_PortalFrame_Normal.png"
   //   );
@@ -411,6 +434,7 @@ function init() {
     mdl.position.z -= 200;
     mdl.position.x += 10;
     scene.add(mdl);
+    objects.push(sell_portal)
 
     new FontLoader().load(
       "https://unpkg.com/three@0.157.0/examples/fonts/helvetiker_bold.typeface.json",
@@ -449,10 +473,8 @@ function init() {
     let coll = new THREE.Mesh(
       geometry,
       new THREE.MeshPhongMaterial({
-        color: 0xdddddd,
+        color: 0x401961,
         transparent: true,
-        emissive: 0x0000ff,
-        emissiveIntensity: 100,
       })
     );
     let texture = new THREE.VideoTexture(
@@ -463,7 +485,7 @@ function init() {
       THREE.RepeatWrapping
     );
     coll.material.map = texture;
-    coll.material.emissiveMap = texture;
+    coll.material.alphaMap = texture;
     coll.scale.set(100, 150, 10);
     coll.material.opacity = 0.95;
     coll.update = collider;
@@ -480,7 +502,7 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
   if (
-    controls.getObject().position.distanceTo(new THREE.Vector3(0, 0, 0)) > 1500
+    controls.getObject().position.distanceTo(new THREE.Vector3(0, 0, 0)) > 425.0
   )
     camera.position.set(0, 15, 0);
   const time = performance.now();
