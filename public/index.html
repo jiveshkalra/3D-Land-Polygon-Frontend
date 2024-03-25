@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="main.css" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
 
-  <body>
-    <script
-      async
-      src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"
-    ></script>
-    <script
-      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
-      type="application/javascript"
-    ></script> 
-    <script type="importmap">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3DLand</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <script type="importmap">
       {
         "imports": {
           "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
@@ -30,109 +27,102 @@
         }
       }
     </script>
-    <style>
-      .purchase-div{  
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background-color: #1a202c;
-        border-radius: 10px;
-        padding: 20px; 
-        
+  <style>
+    .purchase-div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #1a202c;
+      border-radius: 10px;
+      padding: 20px;
 
-      }
-      #info{ flex-direction: row-reverse;     }
-      .item-entry{
-        margin-top: 5px;
-        margin-bottom: 5px;
-        margin-left: 10px;
-        margin-right: 10px;
 
-      }
-    </style>
+    }
 
-    <div id="blocker">
-      <div id="instructions" class="w-screen h-screen">
-        <button id="playBtn" class="p-0 m-0 w-screen h-screen text-[10vmin]">
-          Click Anywhere To Enter Web3DLand
+    #info {
+      flex-direction: row-reverse;
+    }
+
+    .item-entry {
+      margin-top: 5px;
+      margin-bottom: 5px;
+      margin-left: 10px;
+      margin-right: 10px;
+
+    }
+  </style>
+
+  <div id="blocker">
+    <div id="instructions" class="w-screen h-screen">
+      <button id="playBtn" class="p-0 m-0 w-screen h-screen text-[10vmin]">
+        Click Anywhere To Enter Web3DLand
+      </button>
+      <button id="settings"
+        onclick='document.getElementById("modal").style.display = document.getElementById("modal").style.display == "block"? "none" : "block"'
+        class="absolute p-4 m-6 bg-purple-800 hover:bg-purple-700 active:bg-purple-500 rounded-lg bottom-0 right-0">
+        <span class="material-symbols-outlined"> settings </span>
+      </button>
+      <div style="display: none" id="modal" class="absolute bg-slate-400 bottom-[100px] right-0 p-4 m-6">
+        <button onclick="()=>{main().then(e=>{if(e){alert('Connected')}})}">
+          Connect Your Wallet
         </button>
-        <button
-          id="settings"
-          onclick='document.getElementById("modal").style.display = document.getElementById("modal").style.display == "block"? "none" : "block"'
-          class="absolute p-4 m-6 bg-purple-800 hover:bg-purple-700 active:bg-purple-500 rounded-lg bottom-0 right-0"
-        >
-          <span class="material-symbols-outlined"> settings </span>
-        </button>
-        <div
-        style="display: none"
-        id="modal"
-          class="absolute bg-slate-400 bottom-[100px] right-0 p-4 m-6"
-          >
-          <button onclick="()=>{main().then(e=>{if(e){alert('Connected')}})}">
-            Connect Your Wallet
+      </div>
+      <div class="w-full h-full flex justify-center items-center">
+        <div id="info" style="display: none" class="purchase-div">
+          <button id="close" class="rounded text-center p-6 hover:bg-red-700 h-full">
+            X
           </button>
-        </div>
-        <div class="w-full h-full flex justify-center items-center">
-          <div id="info" style="display: none" class="purchase-div">
-             <button
-              id="close"
-              class="rounded text-center p-6 hover:bg-red-700 h-full"
-            >
-              X
+          <div class="max-w-[95vw] p-4 text-3xl">
+            <p class="item-entry font-semibold">NAME : <span id="name" class="font-medium"></span></p>
+            <p class="item-entry font-semibold">TOKEN ID : <span id="tokenid" class="font-medium"></span></p>
+            <p class="item-entry font-semibold">PRICE : <span id="price" class="font-medium"></span> MATIC</p>
+            <p class="item-entry font-semibold">CATEGORY: <span id="cat" class="font-medium"></span></p>
+            <p class="item-entry font-semibold">DESCRIPTION: <span id="desc" class="font-medium"></span></p>
+            <hr class="h-px my-8  border-0  bg-gray-700">
+            <button onclick="purchase();"
+              class="rounded-xl p-4 m-2 bg-teal-600 hover:bg-teal-500 active:bg-teal-300 m-6" id="purchasebtn">
+              Purchase Now!!
             </button>
-            <div class="max-w-[95vw] p-4 text-3xl">
-              <p class="item-entry font-semibold">NAME : <span id="name" class="font-medium"></span></p>
-              <p class="item-entry font-semibold">TOKEN ID : <span id="tokenid" class="font-medium"></span></p>
-              <p class="item-entry font-semibold">PRICE : <span id="price" class="font-medium"></span> MATIC</p>
-              <p class="item-entry font-semibold">CATEGORY: <span id="cat" class="font-medium"></span></p>
-              <p class="item-entry font-semibold">DESCRIPTION: <span id="desc" class="font-medium"></span></p>
-              <hr class="h-px my-8  border-0  bg-gray-700">
-              <button
-                onclick="purchase();"
-                class="rounded-xl p-4 m-2 bg-teal-600 hover:bg-teal-500 active:bg-teal-300 m-6"
-                id="purchasebtn"
-              >
-                Purchase Now!!
-              </button>
-              <div id="alreadyOwned" class="item-entry text-emerald-700">
-                You are the owner of this NFT
-              </div>
+            <div id="alreadyOwned" class="item-entry text-emerald-700">
+              You are the owner of this NFT
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- <script type="module" src="main.js"></script> -->
-    <!-- <script type="module" src="game.js"></script> -->
-    <script type="module" src="baby.js"></script>
-    <script src="form.js"></script>
-    <script>
-      const purchase = async () => {
-        document.getElementById("purchasebtn").disabled = true;
-        const MarketplaceJSON = await fetch("/Marketplace").then((res) =>
-          res.json()
-        );
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        let contract = new ethers.Contract(
-          MarketplaceJSON.address,
-          MarketplaceJSON.abi,
-          signer
-        );
-        let price = document.getElementById("price").innerHTML;
-        const tokenId = document.getElementById("tokenid").innerHTML;
-        const salePrice = ethers.utils.parseUnits(price, "ether");
-        console.log("Buying the NFT... Please Wait (Upto 5 mins)");
-        let transaction = await contract.executeSale(tokenId, {
-          value: salePrice,
-        });
-        await transaction.wait();
+  <!-- <script type="module" src="main.js"></script> -->
+  <!-- <script type="module" src="game.js"></script> -->
+  <script type="module" src="baby.js"></script>
+  <script src="form.js"></script>
+  <script>
+    const purchase = async () => {
+      document.getElementById("purchasebtn").disabled = true;
+      const MarketplaceJSON = await fetch("/Marketplace").then((res) =>
+        res.json()
+      );
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      let contract = new ethers.Contract(
+        MarketplaceJSON.address,
+        MarketplaceJSON.abi,
+        signer
+      );
+      let price = document.getElementById("price").innerHTML;
+      const tokenId = document.getElementById("tokenid").innerHTML;
+      const salePrice = ethers.utils.parseUnits(price, "ether");
+      console.log("Buying the NFT... Please Wait (Upto 5 mins)");
+      let transaction = await contract.executeSale(tokenId, {
+        value: salePrice,
+      });
+      await transaction.wait();
 
-        alert("You successfully bought the NFT!");
-      };
-    </script>
-    <!-- <script type="module" src="script.js"></script> -->
-  </body>
+      alert("You successfully bought the NFT!");
+    };
+  </script>
+  <!-- <script type="module" src="script.js"></script> -->
+</body>
+
 </html>

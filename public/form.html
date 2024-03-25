@@ -2,151 +2,171 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Form</title>  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
-    type="application/javascript"></script>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-</script>
-    <script src="./form.js" ></script>
-  </head>
-  <style>
-    *{
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body{
-      display: grid;
-      grid-template-rows: 20% 80%;
-      height: 100vh;
-      background-color: #dedaeb; 
-    }
-    nav{   
-      width: 100%;
-      z-index:1; 
-      display: flex;
-      max-height: 80px;
-      background-color: #694ACA; 
-    } 
-    .nav_heading{
-      color: #F4F1FB;
-    }
-    .nav_sites_btn{
-      color: #F4F1FB;
-      background-color: #9174FE; 
-    }
-    .uploadNFTform{ 
-      background-color: #ffffff; 
-      padding: 10px; 
-      border-radius: 20px; 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      color:#140A10;
-      height: max-content;
-      max-height: max-content; 
-    
-    }
-    .form-div{
-      padding: 10px;
-      margin: 10px;
-    }
-    .form-div{
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    form{
-      width: 100%;
-    }
-    
-    .form-input:focus{
-      outline: none;
-      border: 2px solid #694ACA; 
 
-    }
-      .form-input:active {
-        border: 2px solid #694ACA; 
-      }
-    .form-input{
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      
-      border: 1px solid gray;
-    }
-    .mint_btn{
-       color: white;
-       background-color: #694ACA;
-       border-radius: 30px;
-        padding: 10px 20px; 
-    }
-  </style>
-  <body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3DLand-Upload Form</title>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
 
-    <nav class="py-4">
-      <div class="container mx-auto flex justify-between items-center">
-        <h1 class="p-5 text-3xl font-bold nav_heading">Web3DLand</h1>
-        <ul class="flex space-x-4">
-          <li>
-            <a class="py-2 px-4  text-lg nav_sites_btn font-semibold rounded" href="./">Marketplace</a>
-          </li>
-          <li>
-            <a class="py-2 px-4 text-lg nav_sites_btn font-semibold rounded active" href="./form">Mint NFT</a>
-          </li>
-        </ul>
-        <script>
-          const checkWalletConnection = async  () =>{  
+  <script src="https://cdn.tailwindcss.com"></script>
+  </script>
+  <script src="./form.js"></script>
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    display: grid;
+    grid-template-rows: 20% 80%;
+    height: 100vh;
+    background-color: #dedaeb;
+  }
+
+  nav {
+    width: 100%;
+    z-index: 1;
+    display: flex;
+    max-height: 80px;
+    background-color: #694ACA;
+  }
+
+  .nav_heading {
+    color: #F4F1FB;
+  }
+
+  .nav_sites_btn {
+    color: #F4F1FB;
+    background-color: #9174FE;
+  }
+
+  .uploadNFTform {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #140A10;
+    height: max-content;
+    max-height: max-content;
+
+  }
+
+  .form-div {
+    padding: 10px;
+    margin: 10px;
+  }
+
+  .form-div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  form {
+    width: 100%;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border: 2px solid #694ACA;
+
+  }
+
+  .form-input:active {
+    border: 2px solid #694ACA;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+
+    border: 1px solid gray;
+  }
+
+  .mint_btn {
+    color: white;
+    background-color: #694ACA;
+    border-radius: 30px;
+    padding: 10px 20px;
+  }
+</style>
+
+<body>
+
+  <nav class="py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="p-5 text-3xl font-bold nav_heading">Web3DLand</h1>
+      <ul class="flex space-x-4">
+        <li>
+          <a class="py-2 px-4  text-lg nav_sites_btn font-semibold rounded" href="./">Marketplace</a>
+        </li>
+        <li>
+          <a class="py-2 px-4 text-lg nav_sites_btn font-semibold rounded active" href="./form">Mint NFT</a>
+        </li>
+      </ul>
+      <script>
+        const checkWalletConnection = async () => {
           provider = new ethers.providers.Web3Provider(window.ethereum);
-          const account = await provider.send("eth_requestAccounts", []) 
-          if (typeof account[0] !== 'undefined'  && account[0].length > 0) {
-              const isConnected = true;               
-                document.getElementById("wallet-button").innerText = "Logged In: " + account[0].slice(0, 5) + "..." + account[0].slice(-5);
-          }else{
-                  const isConnected = false;
-                  document.getElementById("wallet-button").innerText = "Connect to wallet";  
-            };
-          }
-        </script>
+          const account = await provider.send("eth_requestAccounts", [])
+          if (typeof account[0] !== 'undefined' && account[0].length > 0) {
+            const isConnected = true;
+            document.getElementById("wallet-button").innerText = "Logged In: " + account[0].slice(0, 5) + "..." + account[0].slice(-5);
+          } else {
+            const isConnected = false;
+            document.getElementById("wallet-button").innerText = "Connect to wallet";
+          };
+        }
+      </script>
 
-        <button class="nav_sites_btn py-2 px-4 rounded font-semibold" onclick="main()" id="wallet-button">Connect to wallet</button>
+      <button class="nav_sites_btn py-2 px-4 rounded font-semibold" onclick="main()" id="wallet-button">Connect to
+        wallet</button>
 
-        <script>
-          checkWalletConnection();
-        </script>
-      </div>
-    </nav>
- 
+      <script>
+        checkWalletConnection();
+      </script>
+    </div>
+  </nav>
 
-    <!-- UPLOAD Form  -->
-    <div class="uploadNFTform flex justify-content items-center  px-5 mx-auto ">
-      <!-- <h1>Current Wallet : (add the the account[0] from the main function here  )</h1> -->
-      <h1 class="formheading text-3xl my-3 mx-24  font-semibold">UPLOAD MODEL IN MARKETPLACE</h1>
-      <hr class="h-px my-8 bg-gray-200 border-0 w-full">
-      <form onsubmit="event.preventDefault(); return false;">
+
+  <!-- UPLOAD Form  -->
+  <div class="uploadNFTform flex justify-content items-center  px-5 mx-auto ">
+    <!-- <h1>Current Wallet : (add the the account[0] from the main function here  )</h1> -->
+    <h1 class="formheading text-3xl my-3 mx-24  font-semibold">UPLOAD MODEL IN MARKETPLACE</h1>
+    <hr class="h-px my-8 bg-gray-200 border-0 w-full">
+    <form onsubmit="event.preventDefault(); return false;">
       <div class=" form-div">
-        <label for="model_name" class="font-medium text-lg my-2 mb-6">MODEL NAME </label> 
+        <label for="model_name" class="font-medium text-lg my-2 mb-6">MODEL NAME </label>
         <input type="text" id="model_name" name="model_name" placeholder="Donut" class="form-input" required />
         <!-- <i>Enter Name of 3d model.</i><br> -->
       </div>
       <div class=" form-div">
-        <label for="cost"  class="font-medium text-lg my-2">COST (IN MATIC)</label> <br>
-        <input type="number" step="0.01" id="cost" name="cost" required placeholder="0.01 " class="form-input" pattern="[0-9]+(\.[0-9]{1,2})?" />
+        <label for="cost" class="font-medium text-lg my-2">COST (IN MATIC)</label> <br>
+        <input type="number" step="0.01" id="cost" name="cost" required placeholder="0.01 " class="form-input"
+          pattern="[0-9]+(\.[0-9]{1,2})?" />
         <!-- <i>Enter Cost of 3d model (in MATIC coins)</i><br> -->
       </div>
       <div class=" form-div">
         <label for="description" class="font-medium text-lg my-2">DESCRIPTION</label><br>
-        <textarea id="description" name="description" class="form-input" placeholder="This is a 3d model of a sweet donut." required></textarea>
+        <textarea id="description" name="description" class="form-input"
+          placeholder="This is a 3d model of a sweet donut." required></textarea>
         <!-- <i>Description of the model</i><br> -->
       </div>
-      
+
       <div class=" form-div">
-        <label for="category" class="font-medium text-lg my-2">CATEGORY</label> 
+        <label for="category" class="font-medium text-lg my-2">CATEGORY</label>
         <select id="category" class="form-input" name="category" required>
           <option value="">Select a category</option>
           <option value="Furniture">Furniture</option>
@@ -154,27 +174,30 @@
           <option value="Fashion">Fashion</option>
           <option value="Art">Art</option>
           <option value="Toys">Toys</option>
-        </select> 
-      </div> 
-      
+        </select>
+      </div>
+
       <div class="form-div">
 
-        <label for="model_file"class="font-medium text-lg my-2 mb-6 "> MODEL FILE</label> 
+        <label for="model_file" class="font-medium text-lg my-2 mb-6 "> MODEL FILE</label>
         <!-- <div class="flex items-center justify-center w-full form-div">  -->
-          
-        <label for="model_file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50  "> MODEL FILE
-            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg class="w-8 h-8 mb-4 text-gray-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                </svg>
-                <p class="mb-2 text-sm text-gray-500 "><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                <p class="text-xs text-gray-500 "> .GLB , .FBX , .OBJ , .GTLF  </p>
-            </div>
-            <input id="model_file" type="file" class="hidden"
-            name="model_file"
-            accept=".glb"
-            required />
+
+        <label for="model_file"
+          class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50  ">
+          MODEL FILE
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <svg class="w-8 h-8 mb-4 text-gray-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 20 16">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+            </svg>
+            <p class="mb-2 text-sm text-gray-500 "><span class="font-semibold">Click to upload</span> or drag and drop
+            </p>
+            <p class="text-xs text-gray-500 "> .GLB , .FBX , .OBJ , .GTLF </p>
+          </div>
+          <input id="model_file" type="file" class="hidden" name="model_file" accept=".glb" required />
         </label>
-        
+
         <span id="fileStatus"></span>
 
         <script>
@@ -189,136 +212,138 @@
             }
           });
         </script>
-      </div>  
-                  
-      <span id="showMsg"></span> 
-          <div class="flex justify-end">
-            <button onclick="listNFT()" class="p-2 my-5 mx-4 rounded mint_btn text-md" id="list-button" value="Submit"> 
-              Mint Your NFT
-            </button>
-          </div> 
+      </div>
 
-        
+      <span id="showMsg"></span>
+      <div class="flex justify-end">
+        <button onclick="listNFT()" class="p-2 my-5 mx-4 rounded mint_btn text-md" id="list-button" value="Submit">
+          Mint Your NFT
+        </button>
+      </div>
+
+
     </form>
-  </div> 
+  </div>
   <!-- Error Modal -->
   <div class="fixed z-10 inset-0 overflow-y-auto hidden" id="error-modal">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-            role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-            <div>
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                    <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </div>
-                <div class="mt-3 text-center sm:mt-5">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                        Error
-                    </h3>
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-500">
-                            There was an error processing your request.
-                        </p> <br>
-                        <p class="text-md text-gray-500" id="errorMessage" > 
-                        </p>
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+        role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+        <div>
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+            <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-5">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+              Error
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">
+                There was an error processing your request.
+              </p> <br>
+              <p class="text-md text-gray-500" id="errorMessage">
+              </p>
 
-                    </div>
-                </div>
             </div>
-            <div class="mt-5 sm:mt-6">
-                <button
-                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
-                    onclick="closeErrorModal()">
-                    OK
-                </button>
-            </div>
+          </div>
         </div>
+        <div class="mt-5 sm:mt-6">
+          <button
+            class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
+            onclick="closeErrorModal()">
+            OK
+          </button>
+        </div>
+      </div>
     </div>
-</div> 
-<!-- Success Modal -->
+  </div>
+  <!-- Success Modal -->
   <div class="fixed z-10 inset-0 overflow-y-auto hidden" id="success-modal">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-            role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-            <div>
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                     <img src="../resources/tick.gif" alt="">
-                </div>
-                <div class="mt-3 text-center sm:mt-5">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                        Success
-                    </h3>
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-500">
-                            Your NFT was minted succesfully!
-                        </p> 
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+        role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+        <div>
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+            <img src="../resources/tick.gif" alt="">
+          </div>
+          <div class="mt-3 text-center sm:mt-5">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+              Success
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">
+                Your NFT was minted succesfully!
+              </p>
 
-                    </div>
-                </div>
             </div>
-            <div class="mt-5 sm:mt-6">
-                <button
-                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm"
-                    onclick="closeSuccessModal()">
-                    OK
-                </button>
-            </div>
+          </div>
         </div>
+        <div class="mt-5 sm:mt-6">
+          <button
+            class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm"
+            onclick="closeSuccessModal()">
+            OK
+          </button>
+        </div>
+      </div>
     </div>
-</div> 
-<!-- Loading Modal -->
+  </div>
+  <!-- Loading Modal -->
   <div class="fixed z-10 inset-0 overflow-y-auto hidden " id="loading-modal">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div
+        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+        role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+        <div>
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full ">
+            <img src="../resources/loading.gif" alt="">
+          </div>
+          <div class="mt-3 text-center sm:mt-5">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+              Working on it
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">
+                Your NFT is being Minted , please be patient and wait.
+              </p>
+            </div>
+          </div>
         </div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-            role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-            <div>
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full ">
-                     <img src="../resources/loading.gif" alt="">
-                </div>
-                <div class="mt-3 text-center sm:mt-5">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                        Working on it
-                    </h3>
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-500">
-                            Your NFT is being Minted , please be patient and wait.
-                        </p> 
-                    </div>
-                </div>
-            </div> 
-        </div>
+      </div>
     </div>
-</div> 
-  </body>
-  <script>
-    
-    function closeErrorModal() {
-          document.getElementById('error-modal').classList.add('hidden');
-          enableButton()
-      }
-    function closeLoadingModal() {
-          document.getElementById('loading-modal').classList.add('hidden');
-          enableButton()
-      }
-    function closeSuccessModal() {
-          document.getElementById('success-modal').classList.add('hidden');
-          enableButton()
-      }
-  </script>
-</html>
+  </div>
+</body>
+<script>
 
+  function closeErrorModal() {
+    document.getElementById('error-modal').classList.add('hidden');
+    enableButton()
+  }
+  function closeLoadingModal() {
+    document.getElementById('loading-modal').classList.add('hidden');
+    enableButton()
+  }
+  function closeSuccessModal() {
+    document.getElementById('success-modal').classList.add('hidden');
+    enableButton()
+  }
+</script>
+
+</html>
