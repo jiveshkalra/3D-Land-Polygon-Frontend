@@ -52,7 +52,6 @@
 
     }
   </style>
-
   <div id="blocker">
     <div id="instructions" class="w-screen h-screen">
       <button id="playBtn" class="p-0 m-0 w-screen h-screen text-[10vmin]">
@@ -91,10 +90,17 @@
         </div>
       </div>
     </div>
+    <div id='loader' class="bg-slate-500 w-screen h-screen absolute z-[1000] text-center">
+      <div class="">
+       <div class="loading_dot1 w-[100vw] h-[33.3vh] bg-teal-400 text-center text-black"></div>
+       <div class="loading_dot2 w-[100vw] h-[33.3vh] bg-teal-500 text-center text-black"></div>
+       <div class="loading_dot3 w-[100vw] h-[33.3vh] bg-teal-600 text-center text-black"></div>
+
+       <button class="loading_text absolute top-0 left-0 w-screen h-screen text-center text-[10vmin]">Building World...</button>
+      </div>
+    </div>
   </div>
 
-  <!-- <script type="module" src="main.js"></script> -->
-  <!-- <script type="module" src="game.js"></script> -->
   <script type="module" src="baby.js"></script>
   <script src="form.js"></script>
   <script>

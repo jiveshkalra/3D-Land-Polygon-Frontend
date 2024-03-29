@@ -1,11 +1,72 @@
 body {
-    overflow: hidden;
-    margin: 0px;
-    color: white;
+  overflow: hidden;
+  margin: 0px;
+  color: white;
+}
+
+#instructions {
+  position: absolute;
+  font-family: monospace;
+  background-color: rgba(48, 48, 48, 0.75);
+}
+
+@keyframes loading_impatient {
+  0%{
+    left:-100vw;
   }
+  /* 25%{
+    left:-90vw;
+  }
+  50%{
+    left:-30vw;
+  } */
+  50%{
+    left:0px;
+  }
+  100%{
+    left:0px;
+  }
+}
+@keyframes text_ping {
+  0%{
+    font-size: 5vmin;
+  }
+  50%{
+    font-size: 10vmin;
+  }
+  100%{
+    font-size: 5vmin;
+  }
+}
+.loading_dot1 {
+  animation-name: loading_impatient;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+  position: relative;
+
   
-  #instructions {
-    position: absolute;
-    font-family: monospace;
-    background-color: rgba(48, 48, 48, 0.75);
-  }
+}
+
+.loading_dot2 {
+  animation-delay: 2s;
+  animation-name: loading_impatient;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+  position: relative;
+  
+}
+
+.loading_dot3 {
+  animation-delay: 4s;
+  animation-name: loading_impatient;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+  position: relative;
+  
+}
+.loading_text{
+  /* animation-name: text_ping; */
+  font-size: 10vmin;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+}

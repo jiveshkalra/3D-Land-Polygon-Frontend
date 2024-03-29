@@ -76,7 +76,7 @@ const main = async () => {
   }
 };
 
-addEventListener('DOMContentLoaded', main);
+addEventListener("DOMContentLoaded", main);
 
 function createPedestal(url, objectCode) {
   let fbxloader = new FBXLoader();
@@ -179,7 +179,7 @@ function createTrigger(pedestal, objectCode) {
 }
 function createFloor() {
   // floor
-  let scale = 0.5;
+  let scale = 0.8;
   let floorGeometry = new THREE.PlaneGeometry(
     2000 * scale,
     2000 * scale,
@@ -189,7 +189,7 @@ function createFloor() {
   floorGeometry.rotateX(-Math.PI / 2);
 
   const floorMaterial = new THREE.MeshPhongMaterial({
-    color: 0xb0c87f,
+    color: 0x666666,
     // transparent: true,
   });
   const normalTexture = new THREE.TextureLoader().load(
@@ -209,22 +209,46 @@ function createFloor() {
 
   scene.add(floor);
 
-  let border = new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshBasicMaterial({color:0x104fe3}));
-  border.scale.set(600,600 ,600);
+  let border = new THREE.Mesh(
+    new THREE.SphereGeometry(1),
+    new THREE.MeshBasicMaterial({ color: 0x104fe3 })
+  );
+  border.scale.set(600, 600, 600);
   border.position.y -= 200;
   border.material.side = THREE.BackSide;
   scene.add(border);
 
-  new GLTFLoader().load('./resources/foliage/low_poly_foliage_pack_01.glb', (fol)=>{
-    foliagePack = fol.scene;
-    foliagePack.scale.set(10,10,10)
-    let Geom = foliagePack[0].geometry;
-    let Mate = foliagePack[0].material;
-    let instMesh = new THREE.InstancedMesh(Geom,Mate,no_of_instances_per_foliage);
-    
-    // scene.add(instMesh);
-  });
+  new GLTFLoader().load("./resources/foliage/grass.glb", (fol) => {
+    foliagePack =
+      fol.scene.children[0].children[0].children[0].children[0].children[0];
+    console.log(foliagePack);
+    console.log(foliagePack.material);
+    console.log(foliagePack.geometry);
+    const mesh = new THREE.InstancedMesh(
+      foliagePack.geometry,
+      foliagePack.material,
+      no_of_instances_per_foliage
+    );
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < no_of_instances_per_foliage; i++) {
+      dummy.position.set(
+        Math.random() * 2000 - 1000,
+        0,
+        Math.random() * 2000 - 1000
+      );
+      dummy.rotation.x = THREE.MathUtils.degToRad(-90);
 
+      dummy.scale.set(
+        Math.random() * 10,
+        Math.random() * 10,
+        Math.random() * 10
+      );
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    scene.add(mesh);
+  });
 }
 function createEventListeners() {
   document.getElementById("playBtn").addEventListener("click", function () {
@@ -365,45 +389,45 @@ function init() {
   sceneAndCameraSetup();
   light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 4.5);
   scene.add(light);
-  
+
   controls = new PointerLockControls(camera, document.body);
   scene.add(controls.getObject());
-  
+
   createEventListeners();
-  
+
   raycaster1 = new THREE.Raycaster(
     new THREE.Vector3(),
     new THREE.Vector3(0, -1, 0),
     0,
     10
-    );
-    raycaster2 = new THREE.Raycaster(
-      new THREE.Vector3(),
-      new THREE.Vector3(0, -1, 0),
-      0,
-      5
-      );
-      raycaster3 = new THREE.Raycaster(
-        new THREE.Vector3(),
+  );
+  raycaster2 = new THREE.Raycaster(
+    new THREE.Vector3(),
     new THREE.Vector3(0, -1, 0),
     0,
     5
-    );
-    
-    createFloor();
-    
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-    
-    // new FBXLoader().load("./resources/gate/PortalThing.fbx", (modl) => {
-      //   let  mdl = modl.children[0];
-      //   // mdl.scale.set(0.5, 0.5, 0.5);
-      //   // mdl.position.y -= 30;
-      //   // mdl.position.z -= 200;
-      //   // mdl.position.x += 10;
-      //   console.log(mdl)
+  );
+  raycaster3 = new THREE.Raycaster(
+    new THREE.Vector3(),
+    new THREE.Vector3(0, -1, 0),
+    0,
+    5
+  );
+
+  createFloor();
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // new FBXLoader().load("./resources/gate/PortalThing.fbx", (modl) => {
+  //   let  mdl = modl.children[0];
+  //   // mdl.scale.set(0.5, 0.5, 0.5);
+  //   // mdl.position.y -= 30;
+  //   // mdl.position.z -= 200;
+  //   // mdl.position.x += 10;
+  //   console.log(mdl)
   //   mdl.material.map = new THREE.TextureLoader().load(
   //     "./resources/gate/T_PortalFrame_Normal.png"
   //   );
@@ -436,7 +460,7 @@ function init() {
     mdl.position.z -= 200;
     mdl.position.x += 10;
     scene.add(mdl);
-    objects.push(sell_portal)
+    objects.push(sell_portal);
 
     new FontLoader().load(
       "https://unpkg.com/three@0.157.0/examples/fonts/helvetiker_bold.typeface.json",
@@ -446,21 +470,21 @@ function init() {
           new TextGeometry("Sell Your NFT!!", {
             font: font,
           }),
-          new THREE.MeshPhongMaterial({ color: 0x00ff80})
+          new THREE.MeshPhongMaterial({ color: 0x00ff80 })
         );
-        text.material.bumpMap = new THREE.TextureLoader().load('./resources/normal_Maps/download.jpeg');
+        text.material.bumpMap = new THREE.TextureLoader().load(
+          "./resources/normal_Maps/download.jpeg"
+        );
         text.material.bumpScale = 10;
         window.font = font;
-        text.scale.set(0.1,0.1,0.05);
+        text.scale.set(0.1, 0.1, 0.05);
         text.position.copy(sell_portal.position);
         text.position.y = 180;
         text.geometry.computeBoundingBox();
         text.position.x -= 40;
-        text.lookAt(new THREE.Vector3(0,0,0));
-        text.name='txt';
-        scene.add(text)
-        console.log(text);
-
+        text.lookAt(new THREE.Vector3(0, 0, 0));
+        text.name = "txt";
+        scene.add(text);
       }
     );
 
@@ -522,21 +546,26 @@ function animate() {
   if (currentY > maxY) {
     currentY = parseFloat(startY.toString());
   }
-  pedestals.map((p, i) => {
-    models[i].position.copy(p.position);
-    models[i].position.y = 30;
-    models[i].position.x += 4;
-    models[i].position.z -= 4;
-    // console.log(i)
-    if (p.position.x == 0 && p.position.z == 0) {
-      p.position.x = currentX;
-      p.position.z = currentY;
-      p.children[0].position.x = currentX;
-      p.children[0].position.z = currentY;
-      currentX += 40;
-    }
-  });
-
+  if (models.length == pedestals.length) {
+    setTimeout(() => {
+      document.querySelector('#loader').parentNode.removeChild(document.querySelector('#loader'));
+    }, 10000);
+    pedestals.map((p, i) => {
+      models[i].position.copy(p.position);
+      models[i].position.y = 30;
+      models[i].position.x += 4;
+      models[i].position.z -= 4;
+      // console.log(i)
+      if (p.position.x == 0 && p.position.z == 0) {
+        p.position.x = currentX;
+        p.position.z = currentY;
+        p.children[0].position.x = currentX;
+        p.children[0].position.z = currentY;
+        currentX += 40;
+      }
+    });
+    
+  }
   const delta = (time - prevTime) / 1000;
 
   if (controls.isLocked === true) {
