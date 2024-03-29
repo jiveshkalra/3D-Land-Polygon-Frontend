@@ -54,6 +54,15 @@ var sell_portal;
 let foliagePack;
 let folList = [];
 let no_of_instances_per_foliage = 10000;
+let hidden = false;
+function createOneTimeTimeOut() {
+  if (hidden) return;
+  setTimeout(() => {
+    document
+      .querySelector("#loader")
+      .parentNode.removeChild(document.querySelector("#loader"));
+  }, 10000);
+}
 //start app;
 init();
 animate();
@@ -122,12 +131,6 @@ function createPedestal(url, objectCode) {
   });
 }
 
-// async function createActualPedestal(url_json){
-//   let res = await fetch(url_json);
-//   let data = await res.json();
-//   createPedestal(data.model_url, data);
-//   console.log(data);
-// }
 
 async function loadAllPedestals() {
   let data = await getAllNFTs();
@@ -221,9 +224,7 @@ function createFloor() {
   new GLTFLoader().load("./resources/foliage/grass.glb", (fol) => {
     foliagePack =
       fol.scene.children[0].children[0].children[0].children[0].children[0];
-    console.log(foliagePack);
-    console.log(foliagePack.material);
-    console.log(foliagePack.geometry);
+
     const mesh = new THREE.InstancedMesh(
       foliagePack.geometry,
       foliagePack.material,
@@ -365,8 +366,6 @@ function sceneAndCameraSetup() {
     "./resources/posz.jpg",
     "./resources/negz.jpg",
   ]);
-  // scene.background = texture;
-  // scene.background = new THREE.Color(0x104fe3);
   scene.fog = new THREE.Fog(0xddddff, 0.0, 800.0);
   window.scene = scene;
 }
@@ -420,37 +419,6 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-
-  // new FBXLoader().load("./resources/gate/PortalThing.fbx", (modl) => {
-  //   let  mdl = modl.children[0];
-  //   // mdl.scale.set(0.5, 0.5, 0.5);
-  //   // mdl.position.y -= 30;
-  //   // mdl.position.z -= 200;
-  //   // mdl.position.x += 10;
-  //   console.log(mdl)
-  //   mdl.material.map = new THREE.TextureLoader().load(
-  //     "./resources/gate/T_PortalFrame_Normal.png"
-  //   );
-  //   mdl.material.normalMap = new THREE.TextureLoader().load(
-  //     "./resources/gate/T_PortalFrame_Normal.png"
-  //   );
-  //   mdl.material.metalnessMap = new THREE.TextureLoader().load(
-  //     "./resources/gate/T_PortalFrame_Metallic.png"
-  //   );
-  //   mdl.material.aoMap = new THREE.TextureLoader().load(
-  //     "./resources/gate/T_PortalFrame_AO.png"
-  //   );
-  //   mdl.material.roughnessMap = new THREE.TextureLoader().load(
-  //     "./resources/gate/T_PortalFrame_Roughness.png"
-  //   );
-
-  //   mdl.material.emissiveIntensity = 0.5;
-  //   mdl.material.emissive = new THREE.Color(100, 100, 100);
-  //   mdl.material.emissiveMap = new THREE.TextureLoader().load(
-  //     "./resources/gate/T_PortalFrame_Emissive.png"
-  //   );
-  //   scene.add(mdl);
-  // });
 
   new GLTFLoader().load("./resources/gate/portal_frame.glb", (modl) => {
     let mdl = modl.scenes[0].children[0];
@@ -547,15 +515,12 @@ function animate() {
     currentY = parseFloat(startY.toString());
   }
   if (models.length == pedestals.length) {
-    setTimeout(() => {
-      document.querySelector('#loader').parentNode.removeChild(document.querySelector('#loader'));
-    }, 10000);
+    createOneTimeTimeOut();
     pedestals.map((p, i) => {
       models[i].position.copy(p.position);
       models[i].position.y = 30;
       models[i].position.x += 4;
       models[i].position.z -= 4;
-      // console.log(i)
       if (p.position.x == 0 && p.position.z == 0) {
         p.position.x = currentX;
         p.position.z = currentY;
@@ -564,7 +529,6 @@ function animate() {
         currentX += 40;
       }
     });
-    
   }
   const delta = (time - prevTime) / 1000;
 
@@ -624,6 +588,7 @@ function animate() {
     velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
     direction.z = Number(moveForward) - Number(moveBackward);
+
     direction.x = Number(moveRight) - Number(moveLeft);
     direction.normalize(); // this ensures consistent movements in all directions
 
